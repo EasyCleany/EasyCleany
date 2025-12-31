@@ -11,15 +11,20 @@
 
   <style>
     :root{
-      --bg:#f6faf9;
+      /* hell + modern, Akzent in Richtung #833CCF */
+      --bg:#fbfaff;
       --card:#ffffff;
       --text:#0f1a17;
-      --muted:#5a6b66;
-      --line:#e6eeeb;
-      --accent:#1f6f68;
-      --accent2:#0e4f4a; /* dunkleres blaugrün */
-      --soft:rgba(31,111,104,0.10);
-      --soft2:rgba(31,111,104,0.06);
+      --muted:#5b636f;
+      --line:#ece9f6;
+
+      --accent:#833CCF;
+      --accent2:#5b25a8; /* dunkleres violett */
+      --accent-rgb: 131 60 207;
+
+      --soft:  rgb(var(--accent-rgb) / 0.10);
+      --soft2: rgb(var(--accent-rgb) / 0.06);
+
       --radius:18px;
       --shadow: 0 12px 30px rgba(16,24,40,.08);
     }
@@ -43,23 +48,32 @@
     /* Sticky header */
     .sticky{
       position:sticky; top:0; z-index:50;
-      background:rgba(246,250,249,0.92);
+      background:rgba(251,250,255,0.92);
       backdrop-filter: blur(10px);
-      border-bottom:1px solid rgba(230,238,235,0.85);
+      border-bottom:1px solid rgba(236,233,246,0.85);
     }
     .headerInner{
       max-width:1200px;
       margin:0 auto;
-      position:relative;
       padding:10px 12px 14px;
-      min-height:170px;
+    }
+
+    /* Top row aligned with timeline */
+    .topBar{
+      position:relative;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      min-height:64px;
+      padding:6px 0 0;
     }
 
     .restartBtn{
       position:absolute;
-      right:8px;
-      top:8px;
-      border:1px solid rgba(31,111,104,0.35);
+      right:0;
+      top:50%;
+      transform:translateY(-50%);
+      border:1px solid rgb(var(--accent-rgb) / 0.35);
       background:#fff;
       color:var(--accent2);
       border-radius:999px;
@@ -68,23 +82,24 @@
       cursor:pointer;
       box-shadow: 0 10px 18px rgba(16,24,40,.05);
       transition:.12s ease;
+      white-space:nowrap;
     }
-    .restartBtn:hover{border-color: rgba(31,111,104,0.55); background: rgba(31,111,104,0.05);}
+    .restartBtn:hover{border-color: rgb(var(--accent-rgb) / 0.55); background: var(--soft2);}
 
     /* Mini object icons (top-left) */
     .miniTypes{
       position:absolute;
-      top:8px;
-      left:8px;
+      left:0;
+      top:50%;
+      transform:translateY(-50%);
       display:flex;
       gap:10px;
       align-items:center;
       opacity:0;
       pointer-events:none;
-      transform: translateY(-4px);
       transition: .25s ease;
     }
-    .miniTypes.show{opacity:1; pointer-events:auto; transform:none;}
+    .miniTypes.show{opacity:1; pointer-events:auto;}
     .miniBtn{
       width:46px; height:46px;
       border-radius:14px;
@@ -97,10 +112,10 @@
       overflow:hidden;
       color:var(--accent2);
     }
-    .miniBtn.active{background:var(--soft); border-color: rgba(31,111,104,0.55);}
+    .miniBtn.active{background:var(--soft); border-color: rgb(var(--accent-rgb) / 0.55);}
 
     /* Steps (connected) */
-    .stepsWrap{display:flex; justify-content:center; padding-top:6px;}
+    .stepsWrap{display:flex; justify-content:center;}
     .steps{display:flex; align-items:center; gap:0;}
     .stepItem{
       display:flex;
@@ -114,7 +129,7 @@
     .stepCircle{
       width:50px; height:50px;
       border-radius:999px;
-      border:2px solid rgba(31,111,104,0.25);
+      border:2px solid rgb(var(--accent-rgb) / 0.22);
       background:#fff;
       display:grid; place-items:center;
       box-shadow: 0 8px 14px rgba(16,24,40,.05);
@@ -122,14 +137,14 @@
       overflow:hidden;
       color:var(--accent2);
     }
-    .stepItem.active .stepCircle{background:var(--soft); border-color: rgba(31,111,104,0.55);}
-    .stepItem.done .stepCircle{background:rgba(31,111,104,0.10); border-color: rgba(31,111,104,0.55);}
+    .stepItem.active .stepCircle{background:var(--soft); border-color: rgb(var(--accent-rgb) / 0.55);}
+    .stepItem.done .stepCircle{background:var(--soft2); border-color: rgb(var(--accent-rgb) / 0.55);}
     .stepLabel{font-weight:950; color:var(--muted); letter-spacing:-0.01em; font-size:13px;}
     .stepItem.active .stepLabel{color:var(--accent2)}
     .connector{
       height:2px;
       width:58px;
-      background: rgba(31,111,104,0.18);
+      background: rgb(var(--accent-rgb) / 0.16);
       border-radius:999px;
       transform: translateY(-16px);
       margin:0 6px;
@@ -138,11 +153,11 @@
     /* Price center */
     .priceRow{margin-top:10px; display:flex; justify-content:center; text-align:center;}
     .priceBox{display:flex; flex-direction:column; align-items:center; gap:6px;}
+    .savedLine{font-size:13px; color:var(--muted); font-weight:950; text-align:center;}
+    .savedLine u{ text-underline-offset:3px; }
     .priceLine{display:flex; align-items:baseline; gap:10px;}
     .price{font-size:54px; font-weight:950; letter-spacing:-0.03em; line-height:1;}
     .fixTag{font-weight:950; color:var(--accent2); font-size:14px;}
-    .savedLine{font-size:13px; color:var(--muted); font-weight:950;}
-    .savedLine u{ text-underline-offset:3px; }
     .fineprint{font-size:12px; color:var(--muted); line-height:1.35; max-width:680px; font-weight:900;}
 
     /* Headings */
@@ -168,8 +183,8 @@
       overflow:hidden;
       color:var(--accent2);
     }
-    .choiceCard:hover{transform: translateY(-2px); border-color: rgba(31,111,104,0.35);}
-    .choiceCard.selected{border-color: rgba(31,111,104,0.65); background: rgba(31,111,104,0.06);}
+    .choiceCard:hover{transform: translateY(-2px); border-color: rgb(var(--accent-rgb) / 0.35);}
+    .choiceCard.selected{border-color: rgb(var(--accent-rgb) / 0.65); background: var(--soft2);}
     .choiceInner{display:flex; flex-direction:column; gap:10px; align-items:center; text-align:center;}
     .choiceIcon{width:92px; height:92px; display:grid; place-items:center;}
     .choiceTitle{font-weight:950; font-size:18px; color:var(--accent2);}
@@ -229,7 +244,7 @@
       min-width:64px;
       text-align:center;
     }
-    .chip.on{background: var(--soft); border-color: rgba(31,111,104,0.55); color: var(--accent2);}
+    .chip.on{background: var(--soft); border-color: rgb(var(--accent-rgb) / 0.55); color: var(--accent2);}
 
     /* Inputs */
     input, textarea{
@@ -243,8 +258,8 @@
       outline:none;
     }
     input:focus, textarea:focus{
-      border-color:rgba(31,111,104,0.65);
-      box-shadow:0 0 0 4px rgba(31,111,104,0.12);
+      border-color: rgb(var(--accent-rgb) / 0.65);
+      box-shadow:0 0 0 4px rgb(var(--accent-rgb) / 0.12);
     }
 
     /* Slider */
@@ -268,18 +283,18 @@
       position:relative;
       color:var(--accent2);
     }
-    .smallToggle:hover{border-color: rgba(31,111,104,0.35);}
-    .smallToggle.on{background:var(--soft2); border-color: rgba(31,111,104,0.55);}
+    .smallToggle:hover{border-color: rgb(var(--accent-rgb) / 0.35);}
+    .smallToggle.on{background:var(--soft2); border-color: rgb(var(--accent-rgb) / 0.55);}
     .smallToggle .tTitle{font-weight:950; color:var(--text); font-size:13px;}
     .smallToggle .tSub{font-weight:900; color:var(--muted); font-size:12px;}
     .ico24{width:22px;height:22px;display:block;color:var(--accent2);}
 
-    /* Tooltips (kontrastreich) */
+    /* Tooltips (heller, im violett-Ton) */
     .infoWrap{position:relative; display:inline-flex; align-items:center;}
     .infoDot{
       width:20px; height:20px;
       border-radius:999px;
-      border:1px solid rgba(31,111,104,0.55);
+      border:1px solid rgb(var(--accent-rgb) / 0.55);
       background:#fff;
       display:grid; place-items:center;
       cursor:help;
@@ -291,9 +306,9 @@
       top:26px;
       width:380px;
       max-width:420px;
-      background:var(--accent2);
+      background: rgb(var(--accent-rgb) / 0.92);
       color:#fff;
-      border:1px solid rgba(255,255,255,0.10);
+      border:1px solid rgb(255 255 255 / 0.16);
       border-radius:14px;
       box-shadow: 0 18px 40px rgba(16,24,40,.18);
       padding:12px 14px;
@@ -334,8 +349,8 @@
       overflow:visible;
       color:var(--accent2);
     }
-    .tile:hover{transform: translateY(-2px); border-color: rgba(31,111,104,0.35);}
-    .tile.on{border-color: rgba(31,111,104,0.65); background: var(--soft2);}
+    .tile:hover{transform: translateY(-2px); border-color: rgb(var(--accent-rgb) / 0.35);}
+    .tile.on{border-color: rgb(var(--accent-rgb) / 0.65); background: var(--soft2);}
     /* Preis oben mittig */
     .tileTop{
       font-weight:950;
@@ -370,8 +385,8 @@
       cursor:pointer;
     }
     .btn.primary{background:var(--accent); color:#fff;}
-    .btn.primary:hover{background:#1a625c;}
-    .btn.secondary{background:transparent; border:1px solid rgba(31,111,104,0.35); color:var(--accent2);}
+    .btn.primary:hover{background:#6f31b8;}
+    .btn.secondary{background:transparent; border:1px solid rgb(var(--accent-rgb) / 0.35); color:var(--accent2);}
 
     .error{
       display:none;
@@ -409,7 +424,7 @@
       border:1px solid var(--line);
       border-radius:999px;
       padding:7px 10px;
-      background:rgba(246,250,249,0.7);
+      background:rgba(251,250,255,0.7);
       font-size:12px;
       color:var(--muted);
       font-weight:900;
@@ -435,7 +450,7 @@
       gap:10px;
       justify-content:flex-end;
       flex-wrap:wrap;
-      margin-top:2px;
+      margin-top:6px;
     }
     .btn.square{
       border-radius:16px;
@@ -477,7 +492,7 @@
     .seg button{
       border:none;
       background:transparent;
-      padding:7px 10px; /* kleiner */
+      padding:7px 10px;
       font-weight:950;
       color:var(--muted);
       cursor:pointer;
@@ -486,14 +501,31 @@
     }
     .seg button.on{background:var(--soft); color:var(--accent2);}
 
+    /* desired date + flexible row */
+    .dateFlexRow{
+      display:grid;
+      grid-template-columns: 1fr 220px;
+      gap:12px;
+      align-items:center;
+    }
+    @media (max-width: 820px){ .dateFlexRow{grid-template-columns:1fr;} }
+    .flexCol{
+      display:flex;
+      flex-direction:column;
+      gap:6px;
+      justify-content:center;
+      align-items:flex-start;
+    }
+
+    /* Hint in violett-ton */
     .hint{
       display:none;
       margin-top:6px;
       padding:8px 10px;
       border-radius:12px;
-      background:rgba(255, 249, 219, 0.65);
-      border:1px solid rgba(160, 110, 0, 0.18);
-      color:#6a4b00;
+      background: rgb(var(--accent-rgb) / 0.08);
+      border:1px solid rgb(var(--accent-rgb) / 0.18);
+      color:#4a1b84;
       font-size:12px;
       font-weight:900;
       line-height:1.35;
@@ -502,17 +534,17 @@
 
     /* Drag & drop */
     .dropZone{
-      border:1.5px dashed rgba(31,111,104,0.35);
+      border:1.5px dashed rgb(var(--accent-rgb) / 0.35);
       border-radius:18px;
       padding:14px;
-      background:rgba(31,111,104,0.04);
+      background: rgb(var(--accent-rgb) / 0.04);
       display:flex;
       justify-content:space-between;
       align-items:center;
       gap:12px;
       flex-wrap:wrap;
     }
-    .dropZone.drag{background:rgba(31,111,104,0.08); border-color: rgba(31,111,104,0.55);}
+    .dropZone.drag{background: rgb(var(--accent-rgb) / 0.08); border-color: rgb(var(--accent-rgb) / 0.55);}
     .fileList{display:flex; flex-wrap:wrap; gap:8px; margin-top:10px;}
     .fileChip{
       position:relative;
@@ -577,10 +609,18 @@
       box-shadow: 0 12px 24px rgba(16,24,40,.06);
       transition:.12s ease;
     }
-    .modalOption:hover{border-color: rgba(31,111,104,0.40); transform: translateY(-1px);}
+    .modalOption:hover{border-color: rgb(var(--accent-rgb) / 0.40); transform: translateY(-1px);}
     .modalOption small{display:block; font-weight:900; color:var(--muted); margin-top:6px; line-height:1.35;}
     .modalRow{display:flex; gap:10px; align-items:center; margin-top:12px; flex-wrap:wrap;}
     .modalRow input{flex:1; min-width:220px;}
+
+    /* Small screens: avoid overlap in top bar */
+    @media (max-width: 560px){
+      .topBar{min-height:auto; padding-bottom:10px;}
+      .miniTypes, .restartBtn{position:static; transform:none;}
+      .topBar{justify-content:space-between; gap:10px; flex-wrap:wrap;}
+      .stepsWrap{order:3; width:100%; justify-content:center; padding-top:10px;}
+    }
   </style>
 </head>
 
@@ -591,61 +631,61 @@
     <div class="modal">
       <h3 class="modalTitle" id="modalTitle">Hinweis</h3>
       <p class="modalText" id="modalText"></p>
-
-      <!-- dynamic content -->
       <div id="modalBody"></div>
-
       <div class="modalActions" id="modalActions"></div>
     </div>
   </div>
 
   <div class="sticky">
     <div class="headerInner">
-      <button class="restartBtn" id="restartBtn" type="button">Neu starten</button>
 
-      <!-- top-left mini object switch -->
-      <div class="miniTypes" id="miniTypes">
-        <button class="miniBtn" id="miniApt" type="button" title="Wohnung"></button>
-        <button class="miniBtn" id="miniHouse" type="button" title="Haus"></button>
-      </div>
+      <!-- top row: mini icons + steps + restart all on one line -->
+      <div class="topBar">
+        <div class="miniTypes" id="miniTypes">
+          <button class="miniBtn" id="miniApt" type="button" title="Wohnung"></button>
+          <button class="miniBtn" id="miniHouse" type="button" title="Haus"></button>
+        </div>
 
-      <!-- steps -->
-      <div class="stepsWrap">
-        <div class="steps" aria-label="Fortschritt">
-          <div class="stepItem active" id="stepIcon1" role="button" tabindex="0">
-            <div class="stepCircle" id="step1Circle"></div>
-            <div class="stepLabel">Objekt</div>
-          </div>
+        <div class="stepsWrap">
+          <div class="steps" aria-label="Fortschritt">
+            <div class="stepItem active" id="stepIcon1" role="button" tabindex="0">
+              <div class="stepCircle" id="step1Circle"></div>
+              <div class="stepLabel">Objekt</div>
+            </div>
 
-          <div class="connector"></div>
+            <div class="connector"></div>
 
-          <div class="stepItem" id="stepIcon2" role="button" tabindex="0">
-            <div class="stepCircle" id="step2Circle"></div>
-            <div class="stepLabel">Sparen</div>
-          </div>
+            <div class="stepItem" id="stepIcon2" role="button" tabindex="0">
+              <div class="stepCircle" id="step2Circle"></div>
+              <div class="stepLabel">Sparen</div>
+            </div>
 
-          <div class="connector"></div>
+            <div class="connector"></div>
 
-          <div class="stepItem" id="stepIcon3" role="button" tabindex="0">
-            <div class="stepCircle" id="step3Circle"></div>
-            <div class="stepLabel">Angebot</div>
+            <div class="stepItem" id="stepIcon3" role="button" tabindex="0">
+              <div class="stepCircle" id="step3Circle"></div>
+              <div class="stepLabel">Angebot</div>
+            </div>
           </div>
         </div>
+
+        <button class="restartBtn" id="restartBtn" type="button">Neu starten</button>
       </div>
 
-      <!-- price -->
+      <!-- price (saved is now ABOVE the price) -->
       <div class="priceRow">
         <div class="priceBox">
+          <div class="savedLine" id="saved">Du hast <u>0 CHF</u> gespart!</div>
           <div class="priceLine">
             <div class="price" id="price">CHF —</div>
             <div class="fixTag">Fixpreis*</div>
           </div>
-          <div class="savedLine" id="saved">Du hast <u>0 CHF</u> gespart!</div>
           <div class="fineprint">
             * Unverbindliche Anfrage – der definitive Fixpreis wird nach Prüfung durch Easy Cleany bestätigt.
           </div>
         </div>
       </div>
+
     </div>
   </div>
 
@@ -670,7 +710,7 @@
             <div class="choiceInner">
               <div class="choiceIcon" id="houseIconBig"></div>
               <div class="choiceTitle">Haus</div>
-              <div class="choiceHint">Einfamilienhaus</div>
+              <div class="choiceHint">Mehr Platz – individuell</div>
             </div>
           </div>
         </div>
@@ -696,9 +736,9 @@
           <div class="rowLine">
             <div class="labelTitle">Fläche (m²)</div>
             <div class="sliderWrap">
-              <input id="sizeInput" type="number" min="20" max="250" step="10" />
+              <input id="sizeInput" type="number" min="20" max="250" step="5" />
               <div>
-                <input id="sizeRange" type="range" min="20" max="250" step="10" value="90" />
+                <input id="sizeRange" type="range" min="20" max="250" step="5" value="60" />
               </div>
             </div>
           </div>
@@ -727,17 +767,17 @@
                   <b>Normal</b> = aufgeräumt & sauber<br>
                   <b>Stark</b> = unaufgeräumt & dreckig<br><br>
                   <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;">
-                    <div style="border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:10px;">
+                    <div style="border:1px solid rgb(255 255 255 / 0.18);border-radius:12px;padding:10px;">
                       <div style="font-weight:950;margin-bottom:8px;">✓ Normal</div>
                       <div style="display:flex;gap:10px;align-items:center;">
-                        <img id="cleanImg" alt="clean" style="width:78px;height:52px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);object-fit:cover;background:#fff;">
+                        <img id="cleanImg" alt="clean" style="width:78px;height:52px;border-radius:10px;border:1px solid rgb(255 255 255 / 0.18);object-fit:cover;background:#fff;">
                         <div style="font-size:12.5px;font-weight:900;line-height:1.35;">Beispielbild – sauber</div>
                       </div>
                     </div>
-                    <div style="border:1px solid rgba(255,255,255,0.18);border-radius:12px;padding:10px;">
+                    <div style="border:1px solid rgb(255 255 255 / 0.18);border-radius:12px;padding:10px;">
                       <div style="font-weight:950;margin-bottom:8px;">✗ Stark</div>
                       <div style="display:flex;gap:10px;align-items:center;">
-                        <img id="messyImg" alt="messy" style="width:78px;height:52px;border-radius:10px;border:1px solid rgba(255,255,255,0.18);object-fit:cover;background:#fff;">
+                        <img id="messyImg" alt="messy" style="width:78px;height:52px;border-radius:10px;border:1px solid rgb(255 255 255 / 0.18);object-fit:cover;background:#fff;">
                         <div style="font-size:12.5px;font-weight:900;line-height:1.35;">Beispielbild – stark</div>
                       </div>
                     </div>
@@ -804,27 +844,25 @@
               <div class="pill" id="offerSize">m²: —</div>
             </div>
 
-            <!-- Text: über den Buttons -->
-            <div class="offerText" style="margin-top:6px;">
-              Deine Anfrage wurde berechnet. Vielen Dank für diese Angaben. Sichere dir dein unschlagbares Angebot so rasch als möglich!
-            </div>
-
             <div class="offerText" style="margin-top:2px;">Folgende Leistungen sind inklusive:</div>
             <div class="servicesPills" id="servicesPills"></div>
 
+            <!-- moved: text UNDER services, ABOVE buttons -->
+            <div class="offerText" style="margin-top:8px;">
+              Deine Anfrage wurde berechnet. Vielen Dank für diese Angaben. Sichere dir dein unschlagbares Angebot so rasch als möglich!<br>
+              Du kannst deine Anfrage jetzt sichern oder direkt bei uns anfragen. Wir melden uns so rasch als möglich wieder bei dir zurück.
+            </div>
+
+            <!-- buttons at the very end, bottom-right -->
             <div class="offerButtons">
               <button class="btn secondary square" type="button" id="saveOfferBtn">Anfrage speichern</button>
               <button class="btn primary square" type="button" id="directAskBtn">Direkt anfragen</button>
-            </div>
-
-            <div class="offerText" style="margin-top:8px;">
-              Du kannst deine Anfrage jetzt sichern oder direkt bei uns anfragen. Wir melden uns so rasch als möglich wieder bei dir zurück.
             </div>
           </div>
 
           <!-- CONTACT (same page, below offer board) -->
           <div class="contactCard hidden" id="contactCard">
-            <h2>Dein Angebot anfragen</h2>
+            <h2 id="contactHeading">Dein Angebot anfragen</h2>
             <p class="sub">Fülle die Felder aus und sende deine Anfrage ab.</p>
 
             <form id="contactForm" novalidate>
@@ -854,19 +892,19 @@
                   <input id="address" required placeholder="Strasse Hausnr, PLZ Ort" />
                 </div>
 
-                <div>
-                  <label class="labelTitle">Wunschtermin *</label>
-                  <input id="desiredDate" type="date" required />
-                </div>
-
-                <div>
-                  <label class="labelTitle" style="display:flex;justify-content:space-between;align-items:center;">
-                    <span>Datum flexibel</span>
-                    <span class="seg" style="transform:translateY(1px);">
+                <!-- Wunschtermin + Datum flexibel in einer Zeile -->
+                <div class="formRowFull dateFlexRow">
+                  <div>
+                    <label class="labelTitle">Wunschtermin *</label>
+                    <input id="desiredDate" type="date" required />
+                  </div>
+                  <div class="flexCol">
+                    <label class="labelTitle">Datum flexibel</label>
+                    <span class="seg">
                       <button type="button" id="flexYes" class="on">Ja</button>
                       <button type="button" id="flexNo">Nein</button>
                     </span>
-                  </label>
+                  </div>
                 </div>
 
                 <div class="formRowFull">
@@ -1046,7 +1084,29 @@
         case "oven":
           return wrap(`<rect x="6" y="4" width="12" height="16" rx="2"></rect><path d="M9 8h6"></path><path d="M9 12h6"></path><path d="M9 16h6"></path>`);
 
-        /* Balkon: 2 Gartenstühle */
+        /* NEU: Stuhl (für "Ohne Balkon") */
+        case "chair":
+          return wrap(`
+            <path d="M8 11h8"></path>
+            <path d="M9 11V7a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v4"></path>
+            <path d="M8 12v4"></path>
+            <path d="M16 12v4"></path>
+            <path d="M7 16h10"></path>
+            <path d="M9 20v-4"></path>
+            <path d="M15 20v-4"></path>
+          `);
+
+        /* NEU: Garagentor / breites Tor (für "Ohne Garage") */
+        case "gate":
+          return wrap(`
+            <path d="M4 20V7a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v13"></path>
+            <path d="M4 20h16"></path>
+            <path d="M8 6v14"></path>
+            <path d="M12 6v14"></path>
+            <path d="M16 6v14"></path>
+          `);
+
+        /* Balkon: (bleibt vorhanden, wird aber nicht mehr genutzt) */
         case "balcony":
           return wrap(`
             <path d="M6 20h12"></path>
@@ -1067,17 +1127,6 @@
 
         case "shield":
           return wrap(`<path d="M12 2l8 4v6c0 5-3.5 9.5-8 10-4.5-.5-8-5-8-10V6l8-4z"></path>`);
-
-        /* Auto-Umriss (besser für "Ohne Garage") */
-        case "carOutline":
-          return wrap(`
-            <path d="M5 16l1-4c.3-1 1.2-2 2.6-2h6.8c1.4 0 2.3 1 2.6 2l1 4"></path>
-            <path d="M6.5 10l1.6-3h7.8l1.6 3"></path>
-            <circle cx="8" cy="17" r="1.5"></circle>
-            <circle cx="16" cy="17" r="1.5"></circle>
-            <path d="M5 16v2"></path>
-            <path d="M19 16v2"></path>
-          `);
 
         case "tree":
           return wrap(`<path d="M12 3c3 2 5 5 5 8a5 5 0 0 1-10 0c0-3 2-6 5-8z"></path><path d="M12 14v7"></path>`);
@@ -1123,15 +1172,30 @@
       return 0;
     }
 
+    /* Standard-Fläche pro Zimmer (Anforderung #5) */
+    const DEFAULT_SIZE_BY_ROOMS = {
+      "1": 35,
+      "1.5": 45,
+      "2": 60,
+      "2.5": 70,
+      "3": 80,
+      "3.5": 90,
+      "4": 100,
+      "4.5": 120,
+      "5": 130,
+      "5.5": 150,
+      "6+": 160
+    };
+
     /* Spar-Kacheln (Rabatte) */
     const SAVINGS = [
-      { id:"noOven",      label:"Ohne Backofen",                        amount:50,  icon:"oven",      info:"Dein Backofen ist bereits blitz blank." },
-      { id:"noBalcony",   label:"Ohne Balkon/Terrasse",                 amount:20,  icon:"balcony",   info:"Du hast keinen Balkon und keine Terrasse." },
-      { id:"noCellar",    label:"Ohne Keller / Dachboden",              amount:20,  icon:"box",       info:"Du hast keinen Keller/Dachboden oder er ist bereits sauber." },
-      { id:"freeParking", label:"Gratis Parkieren vor Ort (Parkplatz)", amount:10,  icon:"parking",   info:"Wir dürfen vor Ort kostenlos parkieren." },
-      { id:"noGuarantee", label:"Ohne Abgabegarantie",                  amount:50,  icon:"shield",    info:"Du benötigst keine Abgabegarantie." },
-      { id:"noGarage",    label:"Ohne Garage",                          amount:20,  icon:"carOutline",info:"Du hast keine Garage oder Stellfläche, die gereinigt werden soll." },
-      { id:"noGarden",    label:"Ohne Garten",                          amount:50,  icon:"tree",      info:"(Haus) Du hast keinen Garten.", houseOnly:true }
+      { id:"noOven",      label:"Ohne Backofen",                        amount:50,  icon:"oven",   info:"Dein Backofen ist bereits blitz blank." },
+      { id:"noBalcony",   label:"Ohne Balkon/Terrasse",                 amount:20,  icon:"chair",  info:"Du hast keinen Balkon und keine Terrasse." },   // #7
+      { id:"noCellar",    label:"Ohne Keller / Dachboden",              amount:20,  icon:"box",    info:"Du hast keinen Keller/Dachboden oder er ist bereits sauber." },
+      { id:"freeParking", label:"Gratis Parkieren vor Ort (Parkplatz)", amount:10,  icon:"parking",info:"Wir dürfen vor Ort kostenlos parkieren." },
+      { id:"noGuarantee", label:"Ohne Abgabegarantie",                  amount:50,  icon:"shield", info:"Du benötigst keine Abgabegarantie." },
+      { id:"noGarage",    label:"Ohne Garage",                          amount:20,  icon:"gate",   info:"Du hast keine Garage oder Stellfläche, die gereinigt werden soll." }, // #8
+      { id:"noGarden",    label:"Ohne Garten",                          amount:50,  icon:"tree",   info:"(Haus) Du hast keinen Garten.", houseOnly:true }
     ];
 
     /* Premium (Extras) */
@@ -1211,6 +1275,7 @@
     const saveOfferBtn = document.getElementById("saveOfferBtn");
     const directAskBtn = document.getElementById("directAskBtn");
     const contactCard = document.getElementById("contactCard");
+    const contactHeading = document.getElementById("contactHeading");
 
     /* Contact form */
     const contactForm = document.getElementById("contactForm");
@@ -1250,7 +1315,9 @@
         rooms: "2",
         baths: 1,
         floors: "1",
-        size: 90,
+        size: DEFAULT_SIZE_BY_ROOMS["2"],
+
+        sizeTouched: false,  // wichtig für automatische Standard-Fläche
 
         windows: "normal",
         shutters: "none",
@@ -1310,12 +1377,19 @@
       const v = Math.max(0, Math.round(n || 0));
       return `-${v} CHF`;
     }
+
+    function headerOffset(){
+      const sticky = document.querySelector(".sticky");
+      const h = sticky ? sticky.offsetHeight : 140;
+      return h + 16;
+    }
     function scrollToEl(el){
-      const y = el.getBoundingClientRect().top + window.scrollY - 120;
+      const y = el.getBoundingClientRect().top + window.scrollY - headerOffset();
       window.scrollTo({ top:y, behavior:"smooth" });
     }
+
     function clamp(n,min,max){ return Math.min(max, Math.max(min, n)); }
-    function snap10(n){ return Math.round(n/10)*10; }
+    function snap5(n){ return Math.round(n/5)*5; }
 
     function basePrice(){
       const table = PRICES[state.type];
@@ -1385,30 +1459,51 @@
       return ok;
     }
 
+    function explainFillStep1(){
+      err1.classList.add("show");
+      openModal({
+        title:"Bitte zuerst ausfüllen",
+        text: state.type === "haus"
+          ? "Bevor du weitergehst, fülle bitte Zimmer, Bäder, Fläche und Etagen aus."
+          : "Bevor du weitergehst, fülle bitte Zimmer, Bäder und Fläche aus.",
+        actions:[{label:"Ok", variant:"primary", onClick: closeModal}]
+      });
+      scrollToEl(step1Section);
+    }
+
     function applyMiniUI(){
       miniTypes.classList.add("show");
       miniApt.classList.toggle("active", state.type === "wohnung");
       miniHouse.classList.toggle("active", state.type === "haus");
     }
 
-    /* step icon clicks */
+    /* step icon clicks (mit Hinweis #12) */
     stepIcon1.addEventListener("click", () => {
       if(!state.typeChosen) return;
       setStep(1);
       scrollToEl(step1Section);
     });
+
     stepIcon2.addEventListener("click", () => {
       if(!state.typeChosen) return;
-      if(!step1Valid(true)){ scrollToEl(step1Section); return; }
+      if(!step1Valid(true)){ explainFillStep1(); return; }
       setStep(2);
       renderSavingsTiles();
       renderPremiumTiles();
       scrollToEl(step2Section);
     });
+
     stepIcon3.addEventListener("click", () => {
       if(!state.typeChosen) return;
-      if(!step1Valid(true)){ scrollToEl(step1Section); return; }
-      if(state.currentStep < 3) return;
+      if(!step1Valid(true)){ explainFillStep1(); return; }
+      if(state.currentStep < 3){
+        openModal({
+          title:"Noch ein Schritt",
+          text:"Bitte berechne zuerst dein Angebot im Schritt «Sparen» (Button «Angebot berechnen»).",
+          actions:[{label:"Ok", variant:"primary", onClick: closeModal}]
+        });
+        return;
+      }
       setStep(3);
       renderOfferBoard();
       scrollToEl(step3Section);
@@ -1470,6 +1565,15 @@
     function finalizeTypeSelection(chosenCard){
       state.typeChosen = true;
       miniTypes.classList.add("show");
+
+      /* #4: Keine Animation beim Haus, direkt weiter */
+      if(state.type === "haus"){
+        typeSection.classList.add("hidden");
+        setStep(1);
+        scrollToEl(step1Section);
+        return;
+      }
+
       const other = (chosenCard === pickApt) ? pickHouse : pickApt;
       other.classList.add("fadeOut");
 
@@ -1505,13 +1609,28 @@
     function renderRoomsChips(){
       const opts = roomsOptions();
       if(!opts.includes(state.rooms)) state.rooms = opts[0];
+
+      // Standard-Grösse setzen, solange User nicht manuell geändert hat (#5)
+      if(!state.sizeTouched){
+        const def = DEFAULT_SIZE_BY_ROOMS[state.rooms];
+        if(def) setSize(def, { markTouched:false });
+      }
+
       roomsChips.innerHTML = "";
       opts.forEach(v => {
         const b = document.createElement("button");
         b.type="button";
         b.className = "chip" + (state.rooms === v ? " on" : "");
         b.textContent = v;
-        b.addEventListener("click", () => { state.rooms = v; renderRoomsChips(); calcAll(); });
+        b.addEventListener("click", () => {
+          state.rooms = v;
+          if(!state.sizeTouched){
+            const def = DEFAULT_SIZE_BY_ROOMS[v];
+            if(def) setSize(def, { markTouched:false });
+          }
+          renderRoomsChips();
+          calcAll();
+        });
         roomsChips.appendChild(b);
       });
     }
@@ -1886,7 +2005,10 @@
     });
 
     toStep2.addEventListener("click", () => {
-      if(!step1Valid(true)) return;
+      if(!step1Valid(true)){
+        explainFillStep1();
+        return;
+      }
       setStep(2);
       renderSavingsTiles();
       renderPremiumTiles();
@@ -1899,7 +2021,7 @@
     });
 
     toOffer.addEventListener("click", () => {
-      if(!step1Valid(true)) { setStep(1); scrollToEl(step1Section); return; }
+      if(!step1Valid(true)) { setStep(1); explainFillStep1(); return; }
       setStep(3);
       renderOfferBoard();
       scrollToEl(step3Section);
@@ -1914,11 +2036,12 @@
 
     directAskBtn.addEventListener("click", () => {
       contactCard.classList.remove("hidden");
-      scrollToEl(contactCard);
+      // #10: scroll exakt bis "Dein Angebot anfragen"
+      scrollToEl(contactHeading || contactCard);
     });
 
     saveOfferBtn.addEventListener("click", () => {
-      openSaveModal(); /* kein Browser-Prompt */
+      openSaveModal();
     });
 
     function fullRestart(type="wohnung"){
@@ -1963,25 +2086,34 @@
     });
 
     /* =========================
-       Size input/range (10er Schritte, Snap)
+       Size input/range (5er Schritte, Snap + select on focus)
        ========================= */
-    function setSize(n){
+    function setSize(n, {markTouched=false}={}){
       if(!Number.isFinite(n)) return;
-      const snapped = snap10(n);
+      const snapped = snap5(n);
       state.size = snapped;
+      if(markTouched) state.sizeTouched = true;
+
       sizeInput.value = String(snapped);
       const min = Number(sizeRange.min), max = Number(sizeRange.max);
       sizeRange.value = String(clamp(snapped, min, max));
       calcAll();
     }
+
+    sizeInput.addEventListener("focus", () => {
+      // #5: Zahl beim Klick/Fokus direkt markiert
+      sizeInput.select();
+    });
+    sizeInput.addEventListener("click", () => sizeInput.select());
+
     sizeInput.addEventListener("input", () => {
       const n = Number(sizeInput.value);
       if(!Number.isFinite(n)) return;
-      setSize(n);
+      setSize(n, {markTouched:true});
     });
     sizeRange.addEventListener("input", () => {
       const n = Number(sizeRange.value);
-      setSize(n);
+      setSize(n, {markTouched:true});
     });
 
     /* =========================
@@ -2074,7 +2206,7 @@
 
       if(!ok){
         errContact.classList.add("show");
-        scrollToEl(contactCard);
+        scrollToEl(contactHeading || contactCard);
         return;
       }
 
@@ -2108,9 +2240,7 @@
           });
           return;
         }
-      }catch(_){
-        // noop
-      }
+      }catch(_){}
 
       const subject = encodeURIComponent("Easy Cleany – Anfrage Endreinigung");
       const body = encodeURIComponent(payload.offerText + "\n\nKontakt:\n" +
