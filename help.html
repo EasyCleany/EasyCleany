@@ -93,6 +93,37 @@
       flex:1;
       font-size:1rem;
     }
+    .search-btn{
+      border:none;
+      background:var(--accent);
+      color:#fff;
+      padding:10px 18px;
+      border-radius:12px;
+      font-weight:700;
+      cursor:pointer;
+      box-shadow:0 8px 18px rgba(26,17,43,.18);
+    }
+    .search-suggestions{
+      max-width:680px;
+      margin:12px auto 0;
+      background:#fff;
+      border-radius:14px;
+      border:1px solid var(--line);
+      box-shadow:var(--shadow);
+      display:none;
+      overflow:hidden;
+      text-align:left;
+    }
+    .search-suggestions.active{display:block;}
+    .search-suggestion{
+      padding:12px 16px;
+      border-bottom:1px solid var(--line);
+      cursor:pointer;
+      font-weight:600;
+      color:var(--muted);
+    }
+    .search-suggestion:last-child{border-bottom:none;}
+    .search-suggestion strong{color:var(--accent-dark);}
 
     .container{
       max-width:1200px;
@@ -105,6 +136,20 @@
 
     .category-grid{
       display:grid;
+      grid-template-columns:repeat(3, minmax(0, 1fr));
+      gap:22px;
+      margin-top:-60px;
+    }
+    @media (max-width: 980px){
+      .category-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
+    }
+    @media (max-width: 640px){
+      .category-grid{grid-template-columns:1fr;}
+    }
+    .category-card{
+      background:var(--card);
+      border-radius:20px;
+      padding:28px 24px;
       grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
       gap:18px;
       margin-top:-60px;
@@ -117,12 +162,24 @@
       border:1px solid var(--line);
       display:flex;
       flex-direction:column;
+      align-items:center;
+      text-align:center;
+      gap:14px;
       gap:12px;
       cursor:pointer;
       transition:transform .15s ease, border-color .15s ease;
     }
     .category-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
     .category-icon{
+      width:88px; height:88px;
+      display:grid; place-items:center;
+      border-radius:24px;
+      background:var(--accent-soft);
+      font-size:2.4rem;
+    }
+    .category-card h3{
+      margin:0;
+      font-size:1.2rem;
       width:54px; height:54px;
       display:grid; place-items:center;
       border-radius:16px;
@@ -214,6 +271,10 @@
       flex-direction:column;
       gap:12px;
       box-shadow:var(--shadow);
+      cursor:default;
+      transition:transform .15s ease, border-color .15s ease;
+    }
+    .subcat-card:hover{border-color:var(--line);}
       cursor:pointer;
       transition:transform .15s ease, border-color .15s ease;
     }
@@ -225,6 +286,61 @@
       background:var(--accent-soft-2);
       font-size:1.4rem;
       color:var(--accent-dark);
+    }
+    .subcat-card h3{margin:0; font-size:1.1rem;}
+    .subcat-card p{margin:0; color:var(--muted); font-size:.92rem;}
+    .subcat-list{
+      margin:0;
+      padding-left:18px;
+      color:var(--muted);
+      font-size:.92rem;
+      line-height:1.5;
+      columns:2;
+      column-gap:28px;
+    }
+    .subcat-list li{break-inside:avoid; margin-bottom:8px;}
+    .subcat-link{
+      color:var(--accent-dark);
+      font-weight:600;
+      text-decoration:none;
+      background:none;
+      border:none;
+      padding:0;
+      text-align:left;
+    }
+    .subcat-link:hover{text-decoration:underline;}
+
+    .search-results-head{
+      display:flex;
+      justify-content:space-between;
+      align-items:flex-end;
+      gap:20px;
+      margin-bottom:20px;
+    }
+    .search-results-head h2{margin:0;}
+    .search-results-meta{color:var(--muted);}
+    .search-results-grid{
+      display:grid;
+      gap:16px;
+    }
+    .search-result-card{
+      background:#fff;
+      border-radius:18px;
+      border:1px solid var(--line);
+      padding:18px;
+      box-shadow:var(--shadow);
+      cursor:pointer;
+      transition:transform .15s ease, border-color .15s ease;
+    }
+    .search-result-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
+    .search-result-card h3{margin:0 0 8px;}
+    .search-result-card p{
+      margin:0;
+      color:var(--muted);
+      display:-webkit-box;
+      -webkit-line-clamp:3;
+      -webkit-box-orient:vertical;
+      overflow:hidden;
     }
     .subcat-card h3{margin:0; font-size:1.05rem;}
     .subcat-card p{margin:0; color:var(--muted); font-size:.92rem;}
@@ -379,6 +495,10 @@
         <p>Finde Antworten rund um Endreinigung, Wohnungsübergabe und Mietrecht – kompakt, klar und in deinem Stil.</p>
         <div class="searchbar" aria-label="Hilfe durchsuchen">
           <span>🔍</span>
+          <input id="searchInput" type="search" placeholder="Thema suchen (z.B. Abnahmeprotokoll, Kaution, Besenrein)" />
+          <button class="search-btn" id="searchBtn" type="button">Suche</button>
+        </div>
+        <div class="search-suggestions" id="searchSuggestions" aria-live="polite"></div>
           <input type="search" placeholder="Thema suchen (z.B. Abnahmeprotokoll, Kaution, Besenrein)" />
         </div>
       </div>
@@ -387,6 +507,16 @@
     <main class="container">
       <section id="helpHome" class="view active" aria-label="Kategorien">
         <div class="category-grid" id="categoryGrid"></div>
+      </section>
+
+      <section id="helpSearch" class="view" aria-label="Suchergebnisse">
+        <div class="search-results-head">
+          <div>
+            <h2>Suchergebnisse</h2>
+            <div class="search-results-meta" id="searchResultsMeta">Gib oben einen Begriff ein.</div>
+          </div>
+        </div>
+        <div class="search-results-grid" id="searchResults"></div>
       </section>
 
       <section id="helpCategory" class="view" aria-label="Kategorie">
@@ -433,6 +563,14 @@
             title: "Übergabe-Standard",
             icon: "✨",
             description: "Wie sauber muss es sein – und wann reicht besenrein?",
+            keywords: ["Endreinigung", "Übergabe", "besenrein", "Renovation", "Sauberkeit"],
+            questions: [
+              "Wie sauber muss die Wohnung bei der Übergabe sein?",
+              "Was bedeutet besenrein wirklich?",
+              "Reicht besenrein bei der Wohnungsabgabe aus?",
+              "Muss ich bei Renovation trotzdem gründlich putzen?",
+              "Welche Räume müssen besonders sauber sein?"
+            ],
             sections: [
               {
                 title: "Wie sauber muss die Wohnung bei der Übergabe sein?",
@@ -453,6 +591,13 @@
             title: "Reinigungsumfang & Spezialflächen",
             icon: "🪟",
             description: "Teppiche, Fensterläden und heikle Arbeiten richtig einordnen.",
+            keywords: ["Teppich shampoonieren", "Fensterläden", "Doppelfenster", "Sicherheitsarbeiten"],
+            questions: [
+              "Muss ich Teppiche shampoonieren?",
+              "Was gilt bei stark verschmutzten Teppichen?",
+              "Muss ich aussenliegende Fensterläden reinigen?",
+              "Welche Reinigungsarbeiten sind zu gefährlich?"
+            ],
             sections: [
               {
                 title: "Muss ich Teppichböden reinigen oder shampoonieren?",
@@ -469,6 +614,13 @@
             title: "Organisation & Verantwortung",
             icon: "🧾",
             description: "Reinigungsfirma, Abnahmegarantie und Folgen bei Mängeln.",
+            keywords: ["Reinigungsfirma", "Abnahmegarantie", "Nachreinigung", "Kosten"],
+            questions: [
+              "Muss ich eine Reinigungsfirma beauftragen?",
+              "Lohnt sich eine Abnahmegarantie?",
+              "Was passiert bei ungenügender Reinigung?",
+              "Wie läuft eine Nachreinigung ab?"
+            ],
             sections: [
               {
                 title: "Muss ich eine professionelle Reinigungsfirma für die Endreinigung engagieren?",
@@ -494,6 +646,13 @@
             title: "Termin & Schlüssel",
             icon: "📅",
             description: "Rückgabezeitpunkt und Übergabeform.",
+            keywords: ["Übergabetermin", "Schlüssel", "Rückgabe", "Fristen"],
+            questions: [
+              "Bis wann muss ich die Wohnung übergeben?",
+              "Was gilt bei Monatsende oder Feiertagen?",
+              "Was passiert, wenn niemand zur Abnahme kommt?",
+              "Kann ich früher ausziehen und die Schlüssel abgeben?"
+            ],
             sections: [
               {
                 title: "Bis wann muss ich am Auszugstermin die Wohnung übergeben?",
@@ -514,6 +673,12 @@
             title: "Protokoll & Unterschrift",
             icon: "📝",
             description: "Was gilt beim Abnahmeprotokoll und bei Unterschriften?",
+            keywords: ["Abnahmeprotokoll", "Unterschrift", "Schuldanerkennung"],
+            questions: [
+              "Muss ich das Übergabeprotokoll unterschreiben?",
+              "Wie reagiere ich bei strittigen Punkten?",
+              "Was tun bei Druck zur Unterschrift?"
+            ],
             sections: [
               {
                 title: "Muss ich das Wohnungsübergabe-Protokoll unterschreiben?",
@@ -539,6 +704,13 @@
             title: "Abnutzung vs. Schaden",
             icon: "⚖️",
             description: "Unterschiede zwischen normaler Abnutzung und übermässigen Schäden.",
+            keywords: ["Abnutzung", "Schaden", "Zeitwert", "Reparaturkosten"],
+            questions: [
+              "Was zählt als normale Abnutzung?",
+              "Wann muss ich für Schäden bezahlen?",
+              "Wie wird der Zeitwert berechnet?",
+              "Wer trägt die Kosten bei alter Ausstattung?"
+            ],
             sections: [
               {
                 title: "Was gilt als normale Abnutzung – und für welche Schäden muss ich bezahlen?",
@@ -555,6 +727,13 @@
             title: "Wände, Umbauten & kleiner Unterhalt",
             icon: "🎨",
             description: "Malerarbeiten, kleine Reparaturen und Rückbau.",
+            keywords: ["Wände streichen", "Umbauten", "kleiner Unterhalt", "Dübellöcher"],
+            questions: [
+              "Muss ich Wände weiss streichen?",
+              "Welche Umbauten muss ich rückgängig machen?",
+              "Was gehört zum kleinen Unterhalt?",
+              "Müssen Dübellöcher geschlossen werden?"
+            ],
             sections: [
               {
                 title: "Muss ich Wände neu streichen oder für Malerarbeiten aufkommen?",
@@ -579,6 +758,12 @@
             title: "Meldungen & Schlüssel",
             icon: "🔐",
             description: "Fristen, Nachforderungen und Schlüsselverlust.",
+            keywords: ["Mängelrüge", "Schlüsselverlust", "Nachforderung", "Frist"],
+            questions: [
+              "Darf der Vermieter später neue Schäden melden?",
+              "Was passiert bei versteckten Mängeln?",
+              "Muss ich bei Schlüsselverlust das Schloss zahlen?"
+            ],
             sections: [
               {
                 title: "Darf der Vermieter Wochen nach dem Auszug neue Schäden melden?",
@@ -604,6 +789,12 @@
             title: "Rückzahlung & Fristen",
             icon: "⏱️",
             description: "Wann wird die Kaution freigegeben?",
+            keywords: ["Mietkaution", "Depot", "Auszahlung", "Frist"],
+            questions: [
+              "Wann bekomme ich die Kaution zurück?",
+              "Darf der Vermieter Geld zurückbehalten?",
+              "Wie lange darf die Freigabe dauern?"
+            ],
             sections: [
               {
                 title: "Wann muss der Vermieter meine Mietkaution zurückzahlen?",
@@ -616,6 +807,12 @@
             title: "Wenn die Kaution blockiert wird",
             icon: "📨",
             description: "Nächste Schritte bei verweigerter Auszahlung.",
+            keywords: ["Kaution blockiert", "Schlichtungsbehörde", "Rückforderung"],
+            questions: [
+              "Was kann ich tun, wenn der Vermieter nicht zahlt?",
+              "Wie fordere ich die Kaution schriftlich zurück?",
+              "Wann kann ich die Bank direkt anweisen?"
+            ],
             sections: [
               {
                 title: "Was kann ich tun, wenn der Vermieter die Kaution nicht zurückzahlt?",
@@ -637,6 +834,12 @@
             title: "Auszugs-Checkliste",
             icon: "✅",
             description: "So behältst du den Überblick bis zur Abgabe.",
+            keywords: ["Checkliste", "Vorbereitung", "Unterlagen", "Übergabeplan"],
+            questions: [
+              "Welche Schritte sollte ich zuerst planen?",
+              "Welche Räume sollte ich priorisieren?",
+              "Welche Unterlagen sollte ich bereithalten?"
+            ],
             sections: [
               {
                 title: "Welche Schritte sollte ich vor der Übergabe planen?",
@@ -653,6 +856,12 @@
             title: "Reibungslose Übergabe",
             icon: "🤝",
             description: "Kommunikation und klare Absprachen.",
+            keywords: ["Kommunikation", "Abnahme", "Protokoll", "Übergabetermin"],
+            questions: [
+              "Wie bestätige ich Termine richtig?",
+              "Was hilft gegen Missverständnisse?",
+              "Wie läuft eine stressfreie Abnahme ab?"
+            ],
             sections: [
               {
                 title: "Wie kommuniziere ich am besten mit der Vermietung?",
@@ -670,6 +879,7 @@
 
     const views = {
       home: document.getElementById("helpHome"),
+      search: document.getElementById("helpSearch"),
       category: document.getElementById("helpCategory"),
       article: document.getElementById("helpArticle")
     };
@@ -682,6 +892,14 @@
     const articleNav = document.getElementById("articleNav");
     const backToHome = document.getElementById("backToHome");
     const backToCategory = document.getElementById("backToCategory");
+    const searchInput = document.getElementById("searchInput");
+    const searchBtn = document.getElementById("searchBtn");
+    const searchSuggestions = document.getElementById("searchSuggestions");
+    const searchResults = document.getElementById("searchResults");
+    const searchResultsMeta = document.getElementById("searchResultsMeta");
+
+    let activeCategory = null;
+    let searchIndex = [];
 
     let activeCategory = null;
 
@@ -731,6 +949,19 @@
       categorySubtitle.textContent = category.description;
       renderCategoryTabs(category.id);
       subcategoryGrid.innerHTML = category.topics.map(topic => `
+        <div class="subcat-card" data-topic="${topic.id}">
+          <span class="subcat-icon">${topic.icon}</span>
+          <h3>${topic.title}</h3>
+          <p>${topic.description}</p>
+          <ul class="subcat-list">
+            ${topic.questions.map(question => `
+              <li><button class="link-btn subcat-link" data-topic="${topic.id}" type="button">${question}</button></li>
+            `).join("")}
+          </ul>
+        </div>
+      `).join("");
+
+      subcategoryGrid.querySelectorAll(".subcat-link").forEach(button => {
         <button class="subcat-card" data-topic="${topic.id}" type="button">
           <span class="subcat-icon">${topic.icon}</span>
           <h3>${topic.title}</h3>
@@ -817,6 +1048,92 @@
       showView("article");
     };
 
+    const buildSearchIndex = () => {
+      searchIndex = helpData.flatMap(category => category.topics.map(topic => {
+        const sectionText = topic.sections.map(section => `${section.title} ${section.text}`).join(" ");
+        const keywordText = (topic.keywords || []).join(" ");
+        const questionText = (topic.questions || []).join(" ");
+        return {
+          category,
+          topic,
+          content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${questionText} ${sectionText}`.toLowerCase(),
+          snippet: topic.sections[0]?.text || ""
+        };
+      }));
+    };
+
+    const matchResults = (query) => {
+      const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
+      if (!terms.length) return [];
+      return searchIndex.filter(item => terms.every(term => item.content.includes(term)));
+    };
+
+    const renderSuggestions = (query) => {
+      const results = matchResults(query).slice(0, 5);
+      if (!results.length) {
+        searchSuggestions.classList.remove("active");
+        searchSuggestions.innerHTML = "";
+        return;
+      }
+      searchSuggestions.classList.add("active");
+      searchSuggestions.innerHTML = results.map(result => `
+        <div class="search-suggestion" data-category="${result.category.id}" data-topic="${result.topic.id}">
+          <strong>${result.topic.title}</strong> · ${result.category.title}
+        </div>
+      `).join("");
+      searchSuggestions.querySelectorAll(".search-suggestion").forEach(item => {
+        item.addEventListener("click", () => {
+          const category = helpData.find(entry => entry.id === item.dataset.category);
+          const topic = category.topics.find(entry => entry.id === item.dataset.topic);
+          renderArticle(category, topic);
+          searchSuggestions.classList.remove("active");
+        });
+      });
+    };
+
+    const renderSearchResults = (query) => {
+      const results = matchResults(query);
+      searchResultsMeta.textContent = results.length
+        ? `${results.length} passende Artikel für „${query}“`
+        : `Keine Treffer für „${query}“`;
+      searchResults.innerHTML = results.map(result => `
+        <div class="search-result-card" data-category="${result.category.id}" data-topic="${result.topic.id}">
+          <h3>${result.topic.title}</h3>
+          <p>${result.snippet}</p>
+        </div>
+      `).join("");
+      searchResults.querySelectorAll(".search-result-card").forEach(card => {
+        card.addEventListener("click", () => {
+          const category = helpData.find(entry => entry.id === card.dataset.category);
+          const topic = category.topics.find(entry => entry.id === card.dataset.topic);
+          renderArticle(category, topic);
+        });
+      });
+      showView("search");
+    };
+
+    const handleSearchSubmit = () => {
+      const query = searchInput.value.trim();
+      if (!query) {
+        showView("home");
+        return;
+      }
+      renderSearchResults(query);
+      searchSuggestions.classList.remove("active");
+    };
+
+    backToHome.addEventListener("click", () => showView("home"));
+    backToCategory.addEventListener("click", () => renderCategory(activeCategory));
+    searchInput.addEventListener("input", (event) => renderSuggestions(event.target.value));
+    searchInput.addEventListener("keydown", (event) => {
+      if (event.key === "Enter") {
+        event.preventDefault();
+        handleSearchSubmit();
+      }
+    });
+    searchBtn.addEventListener("click", handleSearchSubmit);
+
+    buildSearchIndex();
     backToHome.addEventListener("click", () => showView("home"));
     backToCategory.addEventListener("click", () => renderCategory(activeCategory));
 
