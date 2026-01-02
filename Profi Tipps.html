@@ -61,22 +61,20 @@
 
   <!-- SEARCH VIEW -->
   <section class="ecpt-container ecpt-view" id="ecptViewSearch">
-    <div class="ecpt-section-head">
-      <h2>Suchergebnisse</h2>
-      <div class="ecpt-muted" id="ecptResultsMeta">Gib oben einen Begriff ein.</div>
-    </div>
-
-    <!-- Ergebnisliste: 3–4 Treffer, je 2 Zeilen -->
-    <div id="ecptResultsWrap" class="ecpt-results"></div>
-
-    <!-- Beliebte Artikel -->
-    <div class="ecpt-popular-block">
-      <div class="ecpt-section-head">
-        <h2>Beliebte Artikel</h2>
-        <div class="ecpt-muted">Top 3 meistgesuchte Artikel oder FAQs.</div>
+    <div class="ecpt-section-head ecpt-results-head">
+      <div class="ecpt-results-head-left">
+        <h2>Suchergebnisse</h2>
+        <div class="ecpt-muted" id="ecptResultsMeta">Gib oben einen Begriff ein.</div>
       </div>
-      <div class="ecpt-popular" id="ecptPopular"></div>
+      <aside class="ecpt-popular-block">
+        <div class="ecpt-popular-title">Beliebte Artikel</div>
+        <div class="ecpt-popular-sub">Top 3 meistgesuchte Artikel oder FAQs.</div>
+        <div class="ecpt-popular" id="ecptPopular"></div>
+      </aside>
     </div>
+
+    <!-- Ergebnisliste: max. 3 Treffer, je 2 Zeilen -->
+    <div id="ecptResultsWrap" class="ecpt-results"></div>
 
     <!-- Nichts passendes gefunden? (Panel klappt auf – wird zusätzlich als Dropdown-Vorschlag angeboten, wenn 0 Treffer) -->
     <div class="ecpt-help" id="ecptHelp" style="display:none;">
@@ -306,6 +304,32 @@
     gap:16px; margin: 22px 0 10px;
     flex-wrap:wrap;
   }
+  #ecpt .ecpt-results-head{
+    align-items:flex-start;
+    gap:24px;
+  }
+  #ecpt .ecpt-results-head-left{
+    flex:1 1 520px;
+  }
+  #ecpt .ecpt-popular-block{
+    flex:0 0 240px;
+    background:rgba(255,255,255,.9);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px;
+    box-shadow: 0 8px 20px rgba(15,26,23,.05);
+  }
+  #ecpt .ecpt-popular-title{
+    font-weight:950;
+    color:var(--accent2);
+    margin-bottom:2px;
+  }
+  #ecpt .ecpt-popular-sub{
+    color:var(--muted);
+    font-weight:800;
+    font-size:.9rem;
+    margin-bottom:10px;
+  }
   #ecpt .ecpt-results{ display:flex; flex-direction:column; gap:10px; padding-bottom: 10px; }
   #ecpt .ecpt-line{
     background:#fff;
@@ -321,39 +345,16 @@
 
   /* Popular tiles – Safari flicker fix */
   #ecpt h2{ margin:0; font-size:1.4rem; }
-  #ecpt .ecpt-popular-block{ margin:18px 0 18px; }
 
   #ecpt .ecpt-popular{
     display:flex;
     flex-direction:column;
     gap:12px;
-    padding-bottom: 6px;
+    padding-bottom: 2px;
   }
   #ecpt .ecpt-popcard{
     width:100%;
-  #ecpt .ecpt-rowbar{
-    margin:18px 0 18px;
-    display:flex;
-    justify-content:space-between;
-    gap:18px;
-    align-items:flex-start;
-    flex-wrap:wrap;
-  }
-  #ecpt .ecpt-rowbar-left{ flex: 1 1 700px; }
-  #ecpt .ecpt-rowbar-title{
-    display:flex; justify-content:space-between; gap:14px; align-items:baseline; flex-wrap:wrap; margin-bottom:10px;
-  }
-  #ecpt h2{ margin:0; font-size:1.4rem; }
-
-  #ecpt .ecpt-popular{
-    display:flex;
-    flex-wrap:nowrap;
-    gap:12px;
-    overflow-x:auto;
-    padding-bottom: 6px;
-  }
-  #ecpt .ecpt-popcard{
-    flex: 0 0 210px;
+    aspect-ratio: 1 / 1;
     background:#fff;
     border:1px solid var(--line);
     border-radius: 18px;
@@ -373,7 +374,7 @@
   }
   #ecpt .ecpt-popimg{
     width:100%;
-    height:92px;
+    height:58%;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -382,13 +383,27 @@
     backface-visibility: hidden;
     -webkit-backface-visibility: hidden;
   }
-  #ecpt .ecpt-popbody{ padding:12px 12px 14px; text-align:left; }
+  #ecpt .ecpt-popbody{
+    padding:10px 12px 12px;
+    text-align:left;
+    height:42%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
   #ecpt .ecpt-poptitle{
     font-weight:950;
     line-height:1.25;
     font-size:1rem;
     margin:0;
     color: var(--accent2);
+  }
+  #ecpt .ecpt-popdesc{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-weight:800;
+    font-size:.86rem;
+    line-height:1.3;
   }
 
   /* Help */
@@ -589,6 +604,15 @@
     #ecpt .ecpt-btn{ width:100%; }
     #ecpt .ecpt-formgrid{ grid-template-columns: 1fr; }
     #ecpt .ecpt-span2{ grid-column:auto; }
+    #ecpt .ecpt-results-head{
+      flex-direction:column;
+    }
+    #ecpt .ecpt-popular-block{
+      width:100%;
+    }
+    #ecpt .ecpt-popcard{
+      aspect-ratio: 3 / 2;
+    }
   }
 </style>
 
@@ -742,8 +766,14 @@
     if(!target) return;
     const el = target.summary || target.heading || target.section;
     if(!el) return;
+    if(target.summary){
+      target.summary.click();
+    }
     if(target.details && !target.details.open){
       target.details.open = true;
+    }
+    if(target.heading){
+      target.heading.click();
     }
     el.scrollIntoView({ behavior:"smooth", block:"start" });
     // small highlight flash
@@ -1142,7 +1172,8 @@
       card.innerHTML = `
         <div class="ecpt-popimg" style="background-image:url('${escapeHtml(imgUrl)}');"></div>
         <div class="ecpt-popbody">
-          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 70))}</p>
+          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 60))}</p>
+          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 80))}</p>
         </div>
       `;
       card.addEventListener("click", () => {
@@ -1308,7 +1339,7 @@
       return;
     }
 
-    const list = matches.slice(0, 4);
+    const list = matches.slice(0, 3);
     els.resultsMeta.textContent = `${list.length} Treffer gefunden`;
 
     list.forEach(m => {
