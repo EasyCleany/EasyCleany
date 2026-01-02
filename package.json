@@ -1,17 +1,13 @@
 {
-  "name": "easycleany-portal",
-  "private": true,
+  "name": "easycleany-multisite",
   "version": "1.0.0",
-  "engines": {
-    "node": "20.x"
-"scripts": {
-  "build": "node tools/build.js"
-}
-  "devDependencies": {
-    "fast-glob": "^3.3.2",
-    "fs-extra": "^11.2.0",
+  "type": "commonjs",
+  "scripts": {
+    "build": "node tools/build.js"
+  },
+  "dependencies": {
     "gray-matter": "^4.0.3",
-    "markdown-it": "^14.1.0",
+    "marked": "^12.0.2",
     "slugify": "^1.6.6"
   }
 }
