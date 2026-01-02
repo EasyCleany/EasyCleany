@@ -1,26 +1,41 @@
 // tools/build.js
-const fs = require("fs");
+// Baut aus Markdown-Artikeln HTML-Seiten + Suchindex.
+// Output ist auf Vercel ausgelegt: Output Directory = "docs".
+
 const fsp = require("fs/promises");
 const path = require("path");
 const matter = require("gray-matter");
-const { marked } = require("marked");
 const slugify = require("slugify");
+
+// IMPORTANT:
+// Diese Datei nutzt CommonJS (require). Pinne in package.json am besten:
+//   "marked": "^4.3.0"
+// neuere major-Versionen von marked können ESM-only sein.
+const { marked } = require("marked");
 
 const ROOT = process.cwd();
 const SITES_DIR = path.join(ROOT, "sites");
+
+// ✅ Vercel: Output Directory = docs
 const OUT_DIR = path.join(ROOT, "docs");
 
-// Profi-Tipps (Quelle + Output)
-const TIPPS_SRC = path.join(SITES_DIR, "profi-tipps");
-const TIPPS_MD_DIR = path.join(TIPPS_SRC, "content", "blog");
-const TIPPS_OUT = path.join(OUT_DIR, "profi-tipps");
-const TIPPS_BLOG_OUT = path.join(TIPPS_OUT, "blog");
-const TIPPS_DATA_OUT = path.join(TIPPS_OUT, "data");
-const TIPPS_INDEX_OUT = path.join(TIPPS_DATA_OUT, "search-index.json");
+// Markdown-Collections, die gebaut werden sollen
+const COLLECTIONS = [
+  {
+    key: "profi-tipps",
+    mdDir: path.join(SITES_DIR, "profi-tipps", "content", "blog"),
+    outSiteDir: path.join(OUT_DIR, "profi-tipps"),
+  },
+  {
+    key: "help",
+    mdDir: path.join(SITES_DIR, "help", "content", "blog"),
+    outSiteDir: path.join(OUT_DIR, "help"),
+  },
+];
 
 // Home-Quelle (optional)
-const HOME_SRC_DIR = path.join(SITES_DIR, "home"); // optional: sites/home/*
-const HOME_ALT_SRC_DIR = path.join(SITES_DIR, "_root"); // optional alternative: sites/_root/*
+const HOME_SRC_DIR = path.join(SITES_DIR, "home");
+const HOME_ALT_SRC_DIR = path.join(SITES_DIR, "_root");
 
 // ---------- helpers ----------
 async function exists(p) {
@@ -65,7 +80,7 @@ function safeSlug(input) {
     lower: true,
     strict: true,
     trim: true,
-  }).slice(0, 90);
+  }).slice(0, 110);
 }
 
 function mdToPlainText(md) {
@@ -88,6 +103,26 @@ function escapeHtml(str) {
     .replaceAll("'", "&#039;");
 }
 
+async function walkMdFiles(dir) {
+  const out = [];
+  if (!(await exists(dir))) return out;
+
+  async function walk(current) {
+    const entries = await fsp.readdir(current, { withFileTypes: true });
+    for (const e of entries) {
+      const full = path.join(current, e.name);
+      if (e.isDirectory()) {
+        await walk(full);
+      } else if (e.isFile() && e.name.toLowerCase().endsWith(".md")) {
+        out.push(full);
+      }
+    }
+  }
+
+  await walk(dir);
+  return out;
+}
+
 function renderArticleHtml({ title, category, tags, updated, bodyHtml }) {
   const cat = category
     ? `<div class="meta">Kategorie: ${escapeHtml(category)}</div>`
@@ -96,12 +131,10 @@ function renderArticleHtml({ title, category, tags, updated, bodyHtml }) {
     Array.isArray(tags) && tags.length
       ? `<div class="meta">Tags: ${tags.map(escapeHtml).join(", ")}</div>`
       : "";
-  const upd = updated
-    ? `<div class="meta">Stand: ${escapeHtml(updated)}</div>`
-    : "";
+  const upd = updated ? `<div class="meta">Stand: ${escapeHtml(updated)}</div>` : "";
 
-  // Blogseite liegt unter /profi-tipps/blog/ -> zurück zur Übersicht: ../index.html
-  // CSS liegt unter /profi-tipps/assets/... -> von blog aus: ../assets/...
+  // Blogseite liegt unter /<site>/blog/ -> zurück zur Übersicht: ../index.html
+  // CSS liegt unter /<site>/assets/... -> von blog aus: ../assets/...
   return `<!doctype html>
 <html lang="de">
 <head>
@@ -180,45 +213,49 @@ function defaultHomeHtml() {
 </html>`;
 }
 
-async function buildTipps() {
-  // Alte Generierung entfernen, damit keine verwaisten HTMLs bleiben
-  await rm(TIPPS_BLOG_OUT);
-  await rm(TIPPS_DATA_OUT);
-  await mkdirp(TIPPS_BLOG_OUT);
-  await mkdirp(TIPPS_DATA_OUT);
+async function buildCollection({ key, mdDir, outSiteDir }) {
+  const blogOut = path.join(outSiteDir, "blog");
+  const dataOut = path.join(outSiteDir, "data");
+  const indexOut = path.join(dataOut, "search-index.json");
 
-  if (!(await exists(TIPPS_MD_DIR))) {
-    // kein Content? trotzdem leeren Index schreiben
-    await fsp.writeFile(TIPPS_INDEX_OUT, JSON.stringify([], null, 2), "utf8");
-    console.log("⚠️ Profi-Tipps: Keine Markdown-Artikel gefunden:", TIPPS_MD_DIR);
+  // Alte Generierung entfernen
+  await rm(blogOut);
+  await rm(dataOut);
+  await mkdirp(blogOut);
+  await mkdirp(dataOut);
+
+  const mdFiles = await walkMdFiles(mdDir);
+  if (!mdFiles.length) {
+    await fsp.writeFile(indexOut, JSON.stringify([], null, 2), "utf8");
+    console.log(`⚠️ ${key}: Keine Markdown-Artikel gefunden: ${mdDir}`);
     return;
   }
 
-  const files = (await fsp.readdir(TIPPS_MD_DIR)).filter((f) => f.endsWith(".md"));
   const index = [];
 
-  for (const file of files) {
-    const full = path.join(TIPPS_MD_DIR, file);
+  for (const full of mdFiles) {
     const raw = await fsp.readFile(full, "utf8");
     const parsed = matter(raw);
 
-    // optional: draft Artikel nicht ausspielen
+    // draft Artikel nicht ausspielen
     if (parsed.data && parsed.data.draft === true) continue;
 
-    const title = parsed.data.title || file.replace(/\.md$/, "");
+    const rel = path.relative(mdDir, full).replace(/\\/g, "/");
+    const baseNoExt = rel.replace(/\.md$/i, "");
+
+    const title = parsed.data.title || path.basename(baseNoExt);
     const category = parsed.data.category || "";
     const tags = parsed.data.tags || [];
     const updated = parsed.data.updated || parsed.data.date || "";
 
-    const baseName = file.replace(/\.md$/, "");
     const slug =
-      safeSlug(parsed.data.slug) || safeSlug(baseName) || safeSlug(title);
+      safeSlug(parsed.data.slug) || safeSlug(baseNoExt.replace(/\//g, "-")) || safeSlug(title);
 
     const bodyMd = parsed.content || "";
     const bodyHtml = marked.parse(bodyMd);
 
     const outHtml = renderArticleHtml({ title, category, tags, updated, bodyHtml });
-    await fsp.writeFile(path.join(TIPPS_BLOG_OUT, `${slug}.html`), outHtml, "utf8");
+    await fsp.writeFile(path.join(blogOut, `${slug}.html`), outHtml, "utf8");
 
     const text = mdToPlainText(bodyMd);
     index.push({
@@ -230,37 +267,59 @@ async function buildTipps() {
       excerpt: text.slice(0, 240),
       text,
       updated,
-      popular: parsed.data.popular === true
+      popular: parsed.data.popular === true,
+      // optional für Debugging:
+      source: rel,
     });
   }
 
-  // Neueste oben (als String-Vergleich ok, wenn ISO-Format genutzt wird)
+  // Neueste oben (wenn ISO-Format genutzt wird)
   index.sort((a, b) => String(b.updated || "").localeCompare(String(a.updated || "")));
 
-  await fsp.writeFile(TIPPS_INDEX_OUT, JSON.stringify(index, null, 2), "utf8");
-  console.log(`✅ Profi-Tipps: ${index.length} Artikel gebaut`);
+  await fsp.writeFile(indexOut, JSON.stringify(index, null, 2), "utf8");
+  console.log(`✅ ${key}: ${index.length} Artikel gebaut`);
 }
 
 async function buildHomeToRoot() {
-  // Wenn sites/home existiert, kopieren wir deren Inhalt in den Root von docs/
-  // (Also docs/index.html, docs/assets/..., etc.)
+  // Wenn sites/home existiert -> nach docs/ kopieren
   if (await exists(HOME_SRC_DIR)) {
     await copyDir(HOME_SRC_DIR, OUT_DIR, { excludeNames: ["content"] });
-    // sicherstellen, dass index.html existiert:
-    if (!(await exists(path.join(OUT_DIR, "index.html")))) {
-      await fsp.writeFile(path.join(OUT_DIR, "index.html"), defaultHomeHtml(), "utf8");
+
+    const idx = path.join(OUT_DIR, "index.html");
+    if (!(await exists(idx))) {
+      await fsp.writeFile(idx, defaultHomeHtml(), "utf8");
+      console.log("✅ Home: index.html fehlte, Default generiert");
+      return;
     }
-    console.log("✅ Home: aus sites/home nach docs/ kopiert");
+
+    // Falls dort noch eine Meta-Weiterleitung drin ist -> überschreiben
+    const raw = await fsp.readFile(idx, "utf8");
+    if (/http-equiv\s*=\s*"refresh"/i.test(raw)) {
+      await fsp.writeFile(idx, defaultHomeHtml(), "utf8");
+      console.log("✅ Home: Redirect-Index ersetzt durch Portal-Index");
+    } else {
+      console.log("✅ Home: aus sites/home nach docs/ kopiert");
+    }
+
     return;
   }
 
   // Alternative Quelle sites/_root
   if (await exists(HOME_ALT_SRC_DIR)) {
     await copyDir(HOME_ALT_SRC_DIR, OUT_DIR, { excludeNames: ["content"] });
-    if (!(await exists(path.join(OUT_DIR, "index.html")))) {
-      await fsp.writeFile(path.join(OUT_DIR, "index.html"), defaultHomeHtml(), "utf8");
+    const idx = path.join(OUT_DIR, "index.html");
+    if (!(await exists(idx))) {
+      await fsp.writeFile(idx, defaultHomeHtml(), "utf8");
+      console.log("✅ Home: index.html fehlte, Default generiert");
+      return;
     }
-    console.log("✅ Home: aus sites/_root nach docs/ kopiert");
+    const raw = await fsp.readFile(idx, "utf8");
+    if (/http-equiv\s*=\s*"refresh"/i.test(raw)) {
+      await fsp.writeFile(idx, defaultHomeHtml(), "utf8");
+      console.log("✅ Home: Redirect-Index ersetzt durch Portal-Index");
+    } else {
+      console.log("✅ Home: aus sites/_root nach docs/ kopiert");
+    }
     return;
   }
 
@@ -270,12 +329,11 @@ async function buildHomeToRoot() {
 }
 
 async function main() {
-  // 1) docs/ komplett neu aufbauen (sauberer Output)
+  // 1) docs/ komplett neu aufbauen
   await rm(OUT_DIR);
   await mkdirp(OUT_DIR);
 
-  // 2) Home zuerst/zuletzt ist egal – wir schreiben sie am Ende nochmal sicherheitshalber.
-  // 3) Alle "Sites" nach docs/<name>/ kopieren (ohne content/)
+  // 2) Alle "Sites" nach docs/<name>/ kopieren (ohne content/)
   if (!(await exists(SITES_DIR))) {
     throw new Error(`SITES Ordner fehlt: ${SITES_DIR}`);
   }
@@ -287,20 +345,22 @@ async function main() {
     const stat = await fsp.stat(src);
     if (!stat.isDirectory()) continue;
 
-    // home/_root ist special: wird in docs/ root kopiert (nicht als Unterordner)
+    // home/_root ist special (wird in docs/ root kopiert)
     if (name === "home" || name === "_root") continue;
 
     const dst = path.join(OUT_DIR, name);
     await copyDir(src, dst, { excludeNames: ["content"] });
   }
 
-  // 4) Profi-Tipps: Artikel + Index generieren
-  await buildTipps();
+  // 3) Markdown-Collections bauen
+  for (const c of COLLECTIONS) {
+    await buildCollection(c);
+  }
 
-  // 5) Home ganz am Ende in Root schreiben (damit definitiv kein Redirect drin ist)
+  // 4) Home ganz am Ende in Root schreiben (ohne Redirect)
   await buildHomeToRoot();
 
-  console.log("✅ Build komplett: docs/ ist bereit für Vercel Output Directory = docs");
+  console.log('✅ Build komplett: docs/ ist bereit (Vercel Output Directory = "docs")');
 }
 
 main().catch((err) => {
