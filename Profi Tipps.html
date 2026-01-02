@@ -1130,6 +1130,41 @@
     }
   }
 
+  async function fetchBlogIndex(){
+    try{
+      const url = absolutize("/blog/");
+      const r = await fetch(url, { method:"GET" });
+      if(!r.ok) return [];
+      const html = await r.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const anchors = Array.from(doc.querySelectorAll("a[href]"));
+      const out = [];
+
+      anchors.forEach(a => {
+        const href = (a.getAttribute("href") || "").trim();
+        if(!href) return;
+        const abs = absolutize(href);
+        if(!isBlogPostUrl(abs)) return;
+        const title = (a.textContent || "").trim() || slugFromUrl(abs);
+        out.push({
+          kind:"blog",
+          id:"blog:" + abs,
+          url: abs,
+          title,
+          excerpt: "Artikel öffnen",
+          fullText: "",
+          isFullLoaded: false,
+          img: PLACEHOLDER_IMG,
+          blob: normalize([title, slugFromUrl(abs), abs].join(" "))
+        });
+      });
+
+      return uniqBy(out, x => x.id);
+    }catch(e){
+      return [];
+    }
+  }
+
   let currentQuery = "";
   let fetchQueue = [];
   let fetching = 0;
@@ -2017,6 +2052,17 @@
 
     // keep dropdown synced if user already typed
     if(currentQuery && currentQuery.length >= 2) updateSuggestionDropdown(currentQuery);
+
+    if(!items.length){
+      fetchBlogIndex().then(remoteBlogs => {
+        if(!remoteBlogs.length) return;
+        blogItems = uniqBy([...blogItems, ...remoteBlogs], x => x.id);
+        items = uniqBy([...blogItems, ...faqItems], x => x.id);
+        renderPopular();
+        scheduleFullTextFetch();
+        if(currentQuery && currentQuery.length >= 2) updateSuggestionDropdown(currentQuery);
+      });
+    }
   }
 
   /* Squarespace late content observer */

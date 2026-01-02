@@ -150,6 +150,14 @@
       background:var(--card);
       border-radius:20px;
       padding:28px 24px;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:18px;
+      margin-top:-60px;
+    }
+    .category-card{
+      background:var(--card);
+      border-radius:20px;
+      padding:20px;
       box-shadow:var(--shadow);
       border:1px solid var(--line);
       display:flex;
@@ -157,6 +165,7 @@
       align-items:center;
       text-align:center;
       gap:14px;
+      gap:12px;
       cursor:pointer;
       transition:transform .15s ease, border-color .15s ease;
     }
@@ -171,6 +180,15 @@
     .category-card h3{
       margin:0;
       font-size:1.2rem;
+      width:54px; height:54px;
+      display:grid; place-items:center;
+      border-radius:16px;
+      background:var(--accent-soft);
+      font-size:1.7rem;
+    }
+    .category-card h3{
+      margin:0;
+      font-size:1.1rem;
       font-weight:800;
     }
     .category-card p{
@@ -257,6 +275,10 @@
       transition:transform .15s ease, border-color .15s ease;
     }
     .subcat-card:hover{border-color:var(--line);}
+      cursor:pointer;
+      transition:transform .15s ease, border-color .15s ease;
+    }
+    .subcat-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
     .subcat-icon{
       width:48px; height:48px;
       border-radius:14px;
@@ -320,6 +342,8 @@
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
+    .subcat-card h3{margin:0; font-size:1.05rem;}
+    .subcat-card p{margin:0; color:var(--muted); font-size:.92rem;}
 
     .article-layout{
       display:grid;
@@ -475,6 +499,8 @@
           <button class="search-btn" id="searchBtn" type="button">Suche</button>
         </div>
         <div class="search-suggestions" id="searchSuggestions" aria-live="polite"></div>
+          <input type="search" placeholder="Thema suchen (z.B. Abnahmeprotokoll, Kaution, Besenrein)" />
+        </div>
       </div>
     </section>
 
@@ -875,6 +901,8 @@
     let activeCategory = null;
     let searchIndex = [];
 
+    let activeCategory = null;
+
     const showView = (viewName) => {
       Object.values(views).forEach(view => view.classList.remove("active"));
       views[viewName].classList.add("active");
@@ -934,6 +962,14 @@
       `).join("");
 
       subcategoryGrid.querySelectorAll(".subcat-link").forEach(button => {
+        <button class="subcat-card" data-topic="${topic.id}" type="button">
+          <span class="subcat-icon">${topic.icon}</span>
+          <h3>${topic.title}</h3>
+          <p>${topic.description}</p>
+        </button>
+      `).join("");
+
+      subcategoryGrid.querySelectorAll("button").forEach(button => {
         button.addEventListener("click", () => {
           const topic = category.topics.find(item => item.id === button.dataset.topic);
           renderArticle(category, topic);
@@ -1098,6 +1134,9 @@
     searchBtn.addEventListener("click", handleSearchSubmit);
 
     buildSearchIndex();
+    backToHome.addEventListener("click", () => showView("home"));
+    backToCategory.addEventListener("click", () => renderCategory(activeCategory));
+
     renderHome();
   </script>
 </body>
