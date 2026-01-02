@@ -761,12 +761,9 @@
   }
 
   /* ---------- FAQ scroll (5) ---------- */
-  function findFaqHeading(includeWidget){
+  function findFaqHeading(includeWidget = false){
     const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
       .filter(el => includeWidget || !isInsideWidget(el))
-  function findFaqHeading(){
-    const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
-      .filter(el => !isInsideWidget(el))
       .filter(el => {
         const t = (el.textContent || "").trim();
         return t && t.length <= 40 && /^faqs$/i.test(t.replace(/\s+/g,""));
@@ -775,7 +772,6 @@
   }
   function findFaqTarget(question){
     const start = findFaqHeading(false);
-    const start = findFaqHeading();
     if(!start) return null;
     const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
     if(!question) return { section };
@@ -921,10 +917,8 @@
     return { title: title.trim(), excerpt: clampStr(excerpt || "", 260) };
   }
 
-  function collectBlogFromAnchors(includeWidget){
+  function collectBlogFromAnchors(includeWidget = false){
     const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => includeWidget || !isInsideWidget(a));
-  function collectBlogFromAnchors(){
-    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
     const out = [];
     for(const a of anchors){
       const href = (a.getAttribute("href") || "").trim();
@@ -951,12 +945,9 @@
     return out;
   }
 
-  function collectBlogFromText(includeWidget){
+  function collectBlogFromText(includeWidget = false){
     const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
       .filter(el => includeWidget || !isInsideWidget(el))
-  function collectBlogFromText(){
-    const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
-      .filter(el => !isInsideWidget(el))
       .filter(el => {
         const t = (el.textContent || "").trim();
         return t.length >= 10 && t.length <= 12000;
@@ -1004,10 +995,8 @@
     return out;
   }
 
-  function collectFaqFromSection(includeWidget){
+  function collectFaqFromSection(includeWidget = false){
     const start = findFaqHeading(includeWidget);
-  function collectFaqFromSection(){
-    const start = findFaqHeading();
     if(!start) return [];
     const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
 
@@ -1015,7 +1004,6 @@
 
     // Prefer <details>
     const details = Array.from(section.querySelectorAll("details")).filter(d => includeWidget || !isInsideWidget(d));
-    const details = Array.from(section.querySelectorAll("details")).filter(d => !isInsideWidget(d));
     if(details.length){
       details.forEach(d => {
         const sum = d.querySelector("summary");
@@ -1038,7 +1026,6 @@
 
     // Fallback: h3/h4/strong questions
     const all = Array.from(section.querySelectorAll("*")).filter(el => includeWidget || !isInsideWidget(el));
-    const all = Array.from(section.querySelectorAll("*")).filter(el => !isInsideWidget(el));
     const startIdx = all.indexOf(start);
     if(startIdx < 0) return [];
     const after = all.slice(startIdx + 1);
@@ -1256,8 +1243,6 @@
       card.innerHTML = `
         <div class="ecpt-popimg" style="background-image:url('${escapeHtml(imgUrl)}');"></div>
         <div class="ecpt-popbody">
-          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
-          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
           <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 60))}</p>
           <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 80))}</p>
         </div>
@@ -1879,9 +1864,6 @@
           (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKonnte ich dein Anliegen klären?",
           [],
           { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
-          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?",
-          [],
-          { prefixNodes: [btn] }
         );
         return;
       }
@@ -1922,9 +1904,6 @@
         excerpt + "\n\nKonnte ich dein Anliegen klären?",
         [],
         { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
-        excerpt + "\n\nKann ich dir noch weiterhelfen?",
-        [],
-        { prefixNodes: [btn] }
       );
       return;
     }
@@ -1934,13 +1913,6 @@
       "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
       [],
       { appendNodes: [createQuestionForm(q)] }
-    const createBtn = mkBtn("Neue Frage stellen", "accent", true);
-    createBtn.onclick = () => openNewQuestionForm(q, "requireDetails");
-    lastBotAskedMore = true;
-    botTypewriter(
-      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?",
-      [],
-      { appendNodes: [createBtn] }
     );
   }
 
@@ -2030,10 +2002,6 @@
       faqItems = collectFaqFromSection(true);
       items = uniqBy([...blogItems, ...faqItems], x => x.id);
     }
-
-    blogItems = uniqBy([...collectBlogFromAnchors(), ...collectBlogFromText()], x => x.id);
-    faqItems = collectFaqFromSection();
-    items = uniqBy([...blogItems, ...faqItems], x => x.id);
 
     // preload cached blog texts into blob so search works immediately
     blogItems.forEach(b => {
