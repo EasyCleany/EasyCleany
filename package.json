@@ -4,10 +4,9 @@
   "version": "1.0.0",
   "engines": {
     "node": "20.x"
-  },
-  "scripts": {
-    "build": "node build.js"
-  },
+"scripts": {
+  "build": "node tools/build.js"
+}
   "devDependencies": {
     "fast-glob": "^3.3.2",
     "fs-extra": "^11.2.0",
