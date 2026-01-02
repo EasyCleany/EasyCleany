@@ -1042,15 +1042,64 @@
       });
     };
 
+    const parseFrontmatter = (content) => {
+      const match = content.match(/^---\s*\n([\s\S]*?)\n---\s*\n?/);
+      if (!match) {
+        return { data: {}, body: content };
+      }
+      const data = {};
+      const body = content.slice(match[0].length);
+      match[1].split(/\r?\n/).forEach(line => {
+        const trimmed = line.trim();
+        if (!trimmed || trimmed.startsWith("#")) return;
+        const sep = trimmed.indexOf(":");
+        if (sep === -1) return;
+        const key = trimmed.slice(0, sep).trim();
+        let value = trimmed.slice(sep + 1).trim();
+        if (!value) return;
+        if ((value.startsWith("\"") && value.endsWith("\"")) || (value.startsWith("'") && value.endsWith("'"))) {
+          value = value.slice(1, -1);
+        } else if (value.startsWith("[") && value.endsWith("]")) {
+          try {
+            value = JSON.parse(value.replace(/'/g, "\""));
+          } catch {
+            value = value.slice(1, -1).split(",").map(item => item.trim());
+          }
+        }
+        data[key] = value;
+      });
+      return { data, body };
+    };
+
+    const stripMarkdown = (markdown) => {
+      return String(markdown || "")
+        .replace(/```[\s\S]*?```/g, " ")
+        .replace(/`[^`]*`/g, " ")
+        .replace(/!\[[^\]]*\]\([^)]+\)/g, " ")
+        .replace(/\[[^\]]*\]\([^)]+\)/g, " ")
+        .replace(/[#>*_~\-]/g, " ")
+        .replace(/\s+/g, " ")
+        .trim();
+    };
+
+    const buildSummary = (text) => {
+      if (!text) return "";
+      const clipped = text.slice(0, 320);
+      const end = clipped.lastIndexOf(".");
+      return (end > 120 ? clipped.slice(0, end + 1) : clipped).trim();
+    };
+
     const parseBlogMarkdown = (filename, content) => {
-      const lines = content.split(/\r?\n/).map(line => line.trim());
-      const title = lines.find(line => line.length > 0) || filename.replace(/\.md$/, "");
-      const bodyLines = lines.slice(lines.findIndex(line => line.length > 0) + 1).filter(Boolean);
-      const body = bodyLines.join(" ").trim();
+      const { data, body } = parseFrontmatter(content);
+      const cleanBody = stripMarkdown(body);
+      const title = data.title || filename.replace(/\.md$/, "");
+      const summary = data.summary || buildSummary(cleanBody);
       return {
         id: `blog-${filename.replace(/\.md$/, "")}`,
         question: title,
-        answer: body || "Dieser Beitrag wird demnächst ergänzt.",
+        answer: summary || "Dieser Beitrag wird demnächst ergänzt.",
+        fullText: cleanBody,
+        keywords: Array.isArray(data.keywords) ? data.keywords : [],
         extras: [],
         sources: ["EasyCleany Blog"]
       };
@@ -1303,6 +1352,7 @@
         const keywordText = (topic.keywords || []).join(" ").toLowerCase();
         const articleKeywords = (article.keywords || []).join(" ").toLowerCase();
         const extrasText = (article.extras || []).join(" ").toLowerCase();
+        const fullText = (article.fullText || "").toLowerCase();
         return {
           category,
           topic,
@@ -1310,9 +1360,9 @@
           question: article.question.toLowerCase(),
           topicTitle: topic.title.toLowerCase(),
           keywordText,
-          bodyText: `${article.answer} ${extrasText}`.toLowerCase(),
-          content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${articleKeywords} ${article.question} ${article.answer} ${extrasText}`.toLowerCase(),
-          snippet: article.answer
+          bodyText: `${article.answer} ${fullText} ${extrasText}`.toLowerCase(),
+          content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${articleKeywords} ${article.question} ${article.answer} ${fullText} ${extrasText}`.toLowerCase(),
+          snippet: article.answer || buildSummary(article.fullText || "")
         };
       })));
     };
