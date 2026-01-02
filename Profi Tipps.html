@@ -761,6 +761,7 @@
   }
 
   /* ---------- FAQ scroll (5) ---------- */
+  function findFaqHeading(includeWidget = false){
   function findFaqHeading(){
     const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
       .filter(el => !isInsideWidget(el))
@@ -774,6 +775,7 @@
     return candidates[0] || null;
   }
   function findFaqTarget(question){
+    const start = findFaqHeading(false);
     const start = findFaqHeading();
   function findFaqTarget(question, includeWidget){
     const start = findFaqHeading(includeWidget);
@@ -922,6 +924,7 @@
     return { title: title.trim(), excerpt: clampStr(excerpt || "", 260) };
   }
 
+  function collectBlogFromAnchors(includeWidget = false){
   function collectBlogFromAnchors(){
     const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
     const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
@@ -953,6 +956,7 @@
     return out;
   }
 
+  function collectBlogFromText(includeWidget = false){
   function collectBlogFromText(){
     const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
       .filter(el => !isInsideWidget(el))
@@ -1006,6 +1010,7 @@
     return out;
   }
 
+  function collectFaqFromSection(includeWidget = false){
   function collectFaqFromSection(){
     const start = findFaqHeading();
   function collectFaqFromSection(includeWidget){
@@ -1258,6 +1263,8 @@
       card.innerHTML = `
         <div class="ecpt-popimg" style="background-image:url('${escapeHtml(imgUrl)}');"></div>
         <div class="ecpt-popbody">
+          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 60))}</p>
+          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 80))}</p>
           <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
           <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
         </div>
