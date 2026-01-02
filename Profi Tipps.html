@@ -67,8 +67,8 @@
         <div class="ecpt-muted" id="ecptResultsMeta">Gib oben einen Begriff ein.</div>
       </div>
       <aside class="ecpt-popular-block">
-        <div class="ecpt-popular-title">Beliebte Artikel</div>
-        <div class="ecpt-popular-sub">Top 3 meistgesuchte Artikel oder FAQs.</div>
+        <div class="ecpt-popular-title">Meistgesuchte Artikel</div>
+        <div class="ecpt-popular-sub">Top 4 Artikel oder FAQs.</div>
         <div class="ecpt-popular" id="ecptPopular"></div>
       </aside>
     </div>
@@ -309,10 +309,13 @@
     gap:24px;
   }
   #ecpt .ecpt-results-head-left{
-    flex:1 1 520px;
+    flex:0 1 620px;
+    max-width: 620px;
   }
   #ecpt .ecpt-popular-block{
-    flex:0 0 240px;
+    margin-left:auto;
+    flex:0 0 320px;
+    align-self:flex-start;
     background:rgba(255,255,255,.9);
     border:1px solid var(--line);
     border-radius:16px;
@@ -327,10 +330,11 @@
   #ecpt .ecpt-popular-sub{
     color:var(--muted);
     font-weight:800;
-    font-size:.9rem;
+    font-size:.82rem;
     margin-bottom:10px;
   }
   #ecpt .ecpt-results{ display:flex; flex-direction:column; gap:10px; padding-bottom: 10px; }
+  #ecpt #ecptResultsWrap{ max-width: 620px; }
   #ecpt .ecpt-line{
     background:#fff;
     border:1px solid rgba(230,238,235,.95);
@@ -347,9 +351,9 @@
   #ecpt h2{ margin:0; font-size:1.4rem; }
 
   #ecpt .ecpt-popular{
-    display:flex;
-    flex-direction:column;
-    gap:12px;
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:10px;
     padding-bottom: 2px;
   }
   #ecpt .ecpt-popcard{
@@ -394,7 +398,7 @@
   #ecpt .ecpt-poptitle{
     font-weight:950;
     line-height:1.25;
-    font-size:1rem;
+    font-size:.9rem;
     margin:0;
     color: var(--accent2);
   }
@@ -402,7 +406,7 @@
     margin:6px 0 0;
     color:var(--muted);
     font-weight:800;
-    font-size:.86rem;
+    font-size:.78rem;
     line-height:1.3;
   }
 
@@ -579,6 +583,15 @@
     gap:10px;
     flex-wrap:wrap;
   }
+  #ecpt .ecpt-chat-form{
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  #ecpt .ecpt-chat-form .ecpt-input{
+    width:100%;
+  }
 
   /* Typing indicator (faster) */
   #ecpt .ecpt-typing{
@@ -612,6 +625,9 @@
     }
     #ecpt .ecpt-popcard{
       aspect-ratio: 3 / 2;
+    }
+    #ecpt .ecpt-popular{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
     }
   }
 </style>
@@ -1152,6 +1168,12 @@
       .map(it => ({...it, p: pop[it.id] || 0}))
       .sort((a,b) => b.p - a.p);
 
+    let picks = ranked.filter(x => x.p > 0).slice(0,4);
+    if(picks.length < 4){
+      const fill = ranked.filter(x => !picks.some(p => p.id === x.id)).slice(0, 4 - picks.length);
+      picks = picks.concat(fill);
+    }
+    picks = picks.slice(0,4);
     let picks = ranked.filter(x => x.p > 0).slice(0,3);
     if(picks.length < 3){
       const fill = ranked.filter(x => !picks.some(p => p.id === x.id)).slice(0, 3 - picks.length);
@@ -1593,6 +1615,11 @@
             actions.forEach(a => act.appendChild(a));
             msg.appendChild(act);
           }
+          if(opts && Array.isArray(opts.appendNodes)){
+            opts.appendNodes.forEach(node => {
+              msg.appendChild(node);
+            });
+          }
         }
       };
       tick();
@@ -1613,10 +1640,74 @@
     return no.some(x => t === x || t.startsWith(x + " "));
   }
 
+  function looksLikeContactRequest(msg){
+    const t = normalize(msg);
+    return [
+      "kontakt",
+      "kontaktangaben",
+      "email",
+      "e-mail",
+      "mailadresse",
+      "telefon",
+      "handynummer",
+      "nummer",
+      "rueckruf",
+      "rückruf",
+      "anrufen",
+      "erreichen",
+      "kontaktdaten"
+    ].some(k => t.includes(k));
+  }
+
+  function openContactRequestForm({ name, email, topic }){
+    showView("openq");
+    els.openQForm.style.display = "";
+    const safeName = name || "Gast";
+    els.openQTitle.value = `Kontaktanfrage: ${safeName}`;
+    els.openQBody.value = `Name: ${name || ""}\nE-Mail: ${email || ""}\n\nAnliegen:\n${topic || ""}`.trim();
+    els.openQNote.textContent = "Bitte prüfen und abschicken. Wir melden uns zeitnah.";
+    setTimeout(() => els.openQBody.focus(), 60);
+  }
+
+  function createContactForm(prefillTopic){
+    const form = document.createElement("div");
+    form.className = "ecpt-chat-form";
+    form.innerHTML = `
+      <input class="ecpt-input" type="text" placeholder="Dein Name" aria-label="Name" />
+      <input class="ecpt-input" type="email" placeholder="Deine E-Mail" aria-label="E-Mail" />
+      <textarea class="ecpt-input" rows="3" placeholder="Worum geht es?" aria-label="Anliegen"></textarea>
+      <button class="ecpt-btn ecpt-btn-accent" type="button">Anfrage senden</button>
+    `;
+    const [nameInput, emailInput, topicInput] = form.querySelectorAll(".ecpt-input");
+    if(prefillTopic) topicInput.value = prefillTopic;
+    const submitBtn = form.querySelector("button");
+    submitBtn.addEventListener("click", () => {
+      const name = (nameInput.value || "").trim();
+      const email = (emailInput.value || "").trim();
+      const topic = (topicInput.value || "").trim();
+      if(!name || !email || !topic){
+        submitBtn.textContent = "Bitte alle Felder ausfüllen";
+        return;
+      }
+      openContactRequestForm({ name, email, topic });
+    });
+    return form;
+  }
+
   async function botAnswer(query){
     const q = (query||"").trim();
     if(!q){
       botTypewriter("Magst du kurz sagen, worum es geht? 🙂", []);
+      return;
+    }
+
+    if(looksLikeContactRequest(q)){
+      const form = createContactForm(q);
+      botTypewriter(
+        "Gerne! Hinterlasse uns kurz deine Kontaktdaten und dein Anliegen, dann melden wir uns zeitnah.",
+        [],
+        { appendNodes: [form] }
+      );
       return;
     }
 
@@ -1679,6 +1770,14 @@
       return;
     }
 
+    const createBtn = mkBtn("Neue Frage stellen", "accent", true);
+    createBtn.onclick = () => openNewQuestionForm(q, "requireDetails");
+    lastBotAskedMore = true;
+    botTypewriter(
+      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?",
+      [],
+      { appendNodes: [createBtn] }
+    );
     lastBotAskedMore = true;
     botTypewriter("Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?", []);
   }
