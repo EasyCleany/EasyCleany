@@ -1174,12 +1174,6 @@
       picks = picks.concat(fill);
     }
     picks = picks.slice(0,4);
-    let picks = ranked.filter(x => x.p > 0).slice(0,3);
-    if(picks.length < 3){
-      const fill = ranked.filter(x => !picks.some(p => p.id === x.id)).slice(0, 3 - picks.length);
-      picks = picks.concat(fill);
-    }
-    picks = picks.slice(0,3);
 
     els.popular.innerHTML = "";
     if(!picks.length){
@@ -1778,8 +1772,6 @@
       [],
       { appendNodes: [createBtn] }
     );
-    lastBotAskedMore = true;
-    botTypewriter("Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?", []);
   }
 
   function sendChat(text){
