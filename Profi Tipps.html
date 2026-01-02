@@ -309,6 +309,13 @@
     gap:24px;
   }
   #ecpt .ecpt-results-head-left{
+    flex:1 1 auto;
+    max-width:none;
+  }
+  #ecpt .ecpt-popular-block{
+    margin-left:auto;
+    margin-right:0;
+    flex:0 0 360px;
     flex:0 1 620px;
     max-width: 620px;
   }
@@ -334,6 +341,11 @@
     margin-bottom:10px;
   }
   #ecpt .ecpt-results{ display:flex; flex-direction:column; gap:10px; padding-bottom: 10px; }
+  #ecpt #ecptResultsWrap{
+    width:100%;
+    max-width:none;
+    margin-top:6px;
+  }
   #ecpt #ecptResultsWrap{ max-width: 620px; }
   #ecpt .ecpt-line{
     background:#fff;
@@ -353,11 +365,13 @@
   #ecpt .ecpt-popular{
     display:grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:0;
     gap:10px;
     padding-bottom: 2px;
   }
   #ecpt .ecpt-popcard{
     width:100%;
+    aspect-ratio: 4 / 3;
     aspect-ratio: 1 / 1;
     background:#fff;
     border:1px solid var(--line);
@@ -390,6 +404,7 @@
   #ecpt .ecpt-popbody{
     padding:10px 12px 12px;
     text-align:left;
+    height:45%;
     height:42%;
     display:flex;
     flex-direction:column;
@@ -398,6 +413,7 @@
   #ecpt .ecpt-poptitle{
     font-weight:950;
     line-height:1.25;
+    font-size:.98rem;
     font-size:.9rem;
     margin:0;
     color: var(--accent2);
@@ -405,6 +421,8 @@
   #ecpt .ecpt-popdesc{
     margin:6px 0 0;
     color:var(--muted);
+    font-weight:600;
+    font-size:.76rem;
     font-weight:800;
     font-size:.78rem;
     line-height:1.3;
@@ -552,6 +570,8 @@
     line-height:1.55;
     width:100%;
     color: var(--text);
+    font-weight:600;
+    font-size:.95rem;
     font-weight:850;
     white-space: pre-wrap;
   }
@@ -1188,6 +1208,8 @@
       card.innerHTML = `
         <div class="ecpt-popimg" style="background-image:url('${escapeHtml(imgUrl)}');"></div>
         <div class="ecpt-popbody">
+          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
+          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
           <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 60))}</p>
           <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 80))}</p>
         </div>
@@ -1663,6 +1685,36 @@
     setTimeout(() => els.openQBody.focus(), 60);
   }
 
+  async function submitOpenQuestionFromChat({ name, email, topic, isPrivate }){
+    if(ECPT_API_BASE){
+      try{
+        await apiPost("/open-questions", {
+          title: `Frage von ${name || "Gast"}`,
+          body: topic,
+          createdAt: nowISO(),
+          pageUrl: window.location.href,
+          email,
+          isPrivate
+        });
+      }catch(e){}
+    }
+
+    if(isPrivate){
+      return;
+    }
+
+    const qs = await loadOpenQ();
+    qs.push({
+      id: Math.random().toString(16).slice(2),
+      title: `Frage von ${name || "Gast"}`,
+      body: `Kontakt: ${name || ""} (${email || ""})\n\n${topic}`,
+      createdAt: nowISO(),
+      status:"open"
+    });
+    await saveOpenQ(qs);
+    await renderOpenQ();
+  }
+
   function createContactForm(prefillTopic){
     const form = document.createElement("div");
     form.className = "ecpt-chat-form";
@@ -1686,6 +1738,65 @@
       openContactRequestForm({ name, email, topic });
     });
     return form;
+  }
+
+  function createQuestionForm(prefillTopic){
+    const form = document.createElement("div");
+    form.className = "ecpt-chat-form";
+    form.innerHTML = `
+      <input class="ecpt-input" type="text" placeholder="Dein Name" aria-label="Name" />
+      <input class="ecpt-input" type="email" placeholder="Deine E-Mail" aria-label="E-Mail" />
+      <textarea class="ecpt-input" rows="4" placeholder="Worum geht es?" aria-label="Anliegen"></textarea>
+      <label class="ecpt-muted ecpt-small" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" class="ecpt-input" style="width:auto;" /> Privat stellen
+      </label>
+      <button class="ecpt-btn ecpt-btn-accent" type="button">Frage senden</button>
+    `;
+    const [nameInput, emailInput, topicInput] = form.querySelectorAll(".ecpt-input");
+    const privateToggle = form.querySelector("input[type='checkbox']");
+    if(prefillTopic) topicInput.value = prefillTopic;
+    const submitBtn = form.querySelector("button");
+    submitBtn.addEventListener("click", async () => {
+      const name = (nameInput.value || "").trim();
+      const email = (emailInput.value || "").trim();
+      const topic = (topicInput.value || "").trim();
+      if(!name || !email || !topic){
+        submitBtn.textContent = "Bitte alle Felder ausfüllen";
+        return;
+      }
+      submitBtn.textContent = "Gesendet ✓";
+      await submitOpenQuestionFromChat({ name, email, topic, isPrivate: !!privateToggle.checked });
+      if(privateToggle.checked){
+        botTypewriter("Danke! Wir melden uns zeitnah bei dir.", []);
+      } else {
+        botTypewriter("Danke! Deine Frage wurde an uns gesendet und erscheint bei den offenen Fragen.", []);
+      }
+    });
+    return form;
+  }
+
+  function createResolutionActions(question){
+    const wrap = document.createElement("div");
+    wrap.className = "ecpt-chat-actions";
+    const okBtn = mkBtn("Frage geklärt", "accent", true);
+    const openBtn = mkBtn("Frage noch offen", "outline", true);
+    okBtn.addEventListener("click", () => {
+      botTypewriter("Super! Danke dir 🙂 Wenn später noch etwas ist, bin ich da.", []);
+    });
+    openBtn.addEventListener("click", () => {
+      const followUpBtn = mkBtn("Neue Frage stellen", "accent", true);
+      followUpBtn.addEventListener("click", () => {
+        const form = createQuestionForm(question);
+        botTypewriter("Schick uns dein Anliegen, wir kümmern uns darum.", [], { appendNodes: [form] });
+      });
+      botTypewriter(
+        "Möchtest du dein Anliegen noch etwas genauer erklären oder die Frage direkt an uns schicken?",
+        [followUpBtn]
+      );
+    });
+    wrap.appendChild(okBtn);
+    wrap.appendChild(openBtn);
+    return wrap;
   }
 
   async function botAnswer(query){
@@ -1717,6 +1828,9 @@
         btn.onclick = () => scrollToFaq(best.title);
         lastBotAskedMore = true;
         botTypewriter(
+          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKonnte ich dein Anliegen klären?",
+          [],
+          { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
           (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?",
           [],
           { prefixNodes: [btn] }
@@ -1757,6 +1871,9 @@
 
       lastBotAskedMore = true;
       botTypewriter(
+        excerpt + "\n\nKonnte ich dein Anliegen klären?",
+        [],
+        { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
         excerpt + "\n\nKann ich dir noch weiterhelfen?",
         [],
         { prefixNodes: [btn] }
@@ -1764,6 +1881,11 @@
       return;
     }
 
+    lastBotAskedMore = true;
+    botTypewriter(
+      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
+      [],
+      { appendNodes: [createQuestionForm(q)] }
     const createBtn = mkBtn("Neue Frage stellen", "accent", true);
     createBtn.onclick = () => openNewQuestionForm(q, "requireDetails");
     lastBotAskedMore = true;
