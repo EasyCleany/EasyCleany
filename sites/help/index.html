@@ -853,13 +853,6 @@
                 answer: "Ja. Löcher sollten fachgerecht zugespachtelt, geschliffen und im passenden Farbton überstrichen werden, damit sie nicht mehr sichtbar sind. Sichtbar verbleibende Löcher gelten als Schaden und können verrechnet werden.",
                 extras: ["Für kleine Löcher reicht oft Fertigspachtel in Kombination mit Farbtupfern.", "Lass die Wand vollständig trocknen, bevor du überstreichst."],
                 sources: ["swisscaution.ch"]
-              },
-              {
-                id: "schaeden-duebel-fuellen",
-                question: "Wie fülle ich Dübellöcher richtig?",
-                answer: "Dübellöcher sollten sauber gefüllt werden, damit die Wand wieder glatt wirkt. Entferne zuerst den Dübel, entferne lose Reste, fülle das Loch mit Spachtelmasse und glätte die Oberfläche. Nach dem Trocknen kannst du die Stelle leicht schleifen und im passenden Farbton überstreichen.",
-                extras: ["Arbeite in dünnen Schichten, damit die Spachtelmasse gleichmässig trocknet.", "Bei tiefen Löchern hilft es, die Masse in zwei Schritten aufzutragen."],
-                sources: ["EasyCleany Blog"]
               }
             ]
           },
@@ -986,6 +979,11 @@
       }
     ];
 
+    const blogSourceConfig = {
+      apiUrl: "https://api.github.com/repos/EasyCleany/EasyCleany/contents/sites/help/content/blog",
+      rawBaseUrl: "https://raw.githubusercontent.com/EasyCleany/EasyCleany/main/sites/help/content/blog"
+    };
+
     const views = {
       home: document.getElementById("helpHome"),
       search: document.getElementById("helpSearch"),
@@ -1024,6 +1022,59 @@
     const showView = (viewName) => {
       Object.values(views).forEach(view => view.classList.remove("active"));
       views[viewName].classList.add("active");
+    };
+
+    const addArticlesToTopic = (topicId, newArticles) => {
+      helpData.forEach(category => {
+        category.topics.forEach(topic => {
+          if (topic.id !== topicId) return;
+          const existingIds = new Set(topic.articles.map(article => article.id));
+          const existingQuestions = new Set(topic.articles.map(article => article.question));
+          newArticles.forEach(article => {
+            if (existingIds.has(article.id) || existingQuestions.has(article.question)) {
+              return;
+            }
+            topic.articles.push(article);
+            existingIds.add(article.id);
+            existingQuestions.add(article.question);
+          });
+        });
+      });
+    };
+
+    const parseBlogMarkdown = (filename, content) => {
+      const lines = content.split(/\r?\n/).map(line => line.trim());
+      const title = lines.find(line => line.length > 0) || filename.replace(/\.md$/, "");
+      const bodyLines = lines.slice(lines.findIndex(line => line.length > 0) + 1).filter(Boolean);
+      const body = bodyLines.join(" ").trim();
+      return {
+        id: `blog-${filename.replace(/\.md$/, "")}`,
+        question: title,
+        answer: body || "Dieser Beitrag wird demnächst ergänzt.",
+        extras: [],
+        sources: ["EasyCleany Blog"]
+      };
+    };
+
+    const loadBlogArticles = async () => {
+      try {
+        const cacheBuster = Date.now();
+        const response = await fetch(`${blogSourceConfig.apiUrl}?t=${cacheBuster}`, { cache: "no-store" });
+        if (!response.ok) return;
+        const files = await response.json();
+        const markdownFiles = files.filter(file => file.name.endsWith(".md"));
+        const articles = [];
+        for (const file of markdownFiles) {
+          const rawUrl = `${blogSourceConfig.rawBaseUrl}/${file.name}?t=${cacheBuster}`;
+          const markdownResponse = await fetch(rawUrl, { cache: "no-store" });
+          if (!markdownResponse.ok) continue;
+          const markdownText = await markdownResponse.text();
+          articles.push(parseBlogMarkdown(file.name, markdownText));
+        }
+        addArticlesToTopic("schaeden-anstrich", articles);
+      } catch (error) {
+        console.warn("Blog-Artikel konnten nicht geladen werden.", error);
+      }
     };
 
     const scrollToElement = (element) => {
@@ -1385,8 +1436,13 @@
       window.location.href = `mailto:easycleany@outlook.com?subject=${subject}&body=${body}`;
     });
 
-    buildSearchIndex();
-    renderHome();
+    const initializeHelp = async () => {
+      await loadBlogArticles();
+      buildSearchIndex();
+      renderHome();
+    };
+
+    initializeHelp();
   </script>
 </body>
 </html>
