@@ -305,6 +305,7 @@
       border-radius:18px;
     }
     .search-results-head h2{margin:0; color:#fff; font-size:2rem;}
+    .search-results-head h2{margin:0; color:#fff; font-size:1.4rem;}
     .search-results-meta{color:rgba(255,255,255,.85);}
     .search-results-grid{
       display:grid;
@@ -321,6 +322,7 @@
     }
     .search-result-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
     .search-result-card h3{margin:0 0 8px; font-size:1.05rem;}
+    .search-result-card h3{margin:0 0 8px;}
     .search-result-card p{
       margin:0;
       color:var(--muted);
@@ -568,6 +570,7 @@
     <section class="hero">
       <div class="hero-inner">
         <h1>Grüezi! Was ist deine Frage?</h1>
+        <h1>Hallo! Wie können wir dir helfen?</h1>
         <p>Finde Antworten rund um Endreinigung, Wohnungsübergabe und Mietrecht – kompakt, klar und in deinem Stil.</p>
         <div class="searchbar" aria-label="Hilfe durchsuchen">
           <span>🔍</span>
@@ -1299,6 +1302,7 @@
         <div class="search-suggestion" data-category="${result.category.id}" data-topic="${result.topic.id}" data-article="${result.article.id}">
           <strong>${result.article.question}</strong>
           <span class="category-tag" data-category="${result.category.id}">${result.category.title}</span>
+          <strong>${result.article.question}</strong> · ${result.topic.title}
         </div>
       `).join("");
       searchSuggestions.querySelectorAll(".search-suggestion").forEach(item => {

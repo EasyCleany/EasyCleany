@@ -761,12 +761,13 @@
   }
 
   /* ---------- FAQ scroll (5) ---------- */
-  function findFaqHeading(includeWidget){
-    const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
-      .filter(el => includeWidget || !isInsideWidget(el))
+  function findFaqHeading(includeWidget = false){
   function findFaqHeading(){
     const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
       .filter(el => !isInsideWidget(el))
+  function findFaqHeading(includeWidget){
+    const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
+      .filter(el => includeWidget || !isInsideWidget(el))
       .filter(el => {
         const t = (el.textContent || "").trim();
         return t && t.length <= 40 && /^faqs$/i.test(t.replace(/\s+/g,""));
@@ -776,12 +777,14 @@
   function findFaqTarget(question){
     const start = findFaqHeading(false);
     const start = findFaqHeading();
+  function findFaqTarget(question, includeWidget){
+    const start = findFaqHeading(includeWidget);
     if(!start) return null;
     const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
     if(!question) return { section };
 
     const qNorm = normalize(question);
-    const details = Array.from(section.querySelectorAll("details")).filter(d => !isInsideWidget(d));
+    const details = Array.from(section.querySelectorAll("details")).filter(d => includeWidget || !isInsideWidget(d));
     for(const d of details){
       const sum = d.querySelector("summary");
       const text = (sum?.textContent || "").trim();
@@ -790,7 +793,7 @@
       }
     }
 
-    const headings = Array.from(section.querySelectorAll("h3,h4,strong")).filter(el => !isInsideWidget(el));
+    const headings = Array.from(section.querySelectorAll("h3,h4,strong")).filter(el => includeWidget || !isInsideWidget(el));
     for(const h of headings){
       const text = (h.textContent || "").trim();
       if(text && normalize(text).includes(qNorm)){
@@ -802,7 +805,7 @@
   }
 
   function scrollToFaq(question){
-    const target = findFaqTarget(question);
+    const target = findFaqTarget(question, false) || findFaqTarget(question, true);
     if(!target) return;
     const el = target.summary || target.heading || target.section;
     if(!el) return;
@@ -921,10 +924,12 @@
     return { title: title.trim(), excerpt: clampStr(excerpt || "", 260) };
   }
 
-  function collectBlogFromAnchors(includeWidget){
-    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => includeWidget || !isInsideWidget(a));
+  function collectBlogFromAnchors(includeWidget = false){
   function collectBlogFromAnchors(){
     const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
+    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
+  function collectBlogFromAnchors(includeWidget){
+    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => includeWidget || !isInsideWidget(a));
     const out = [];
     for(const a of anchors){
       const href = (a.getAttribute("href") || "").trim();
@@ -951,12 +956,13 @@
     return out;
   }
 
-  function collectBlogFromText(includeWidget){
-    const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
-      .filter(el => includeWidget || !isInsideWidget(el))
+  function collectBlogFromText(includeWidget = false){
   function collectBlogFromText(){
     const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
       .filter(el => !isInsideWidget(el))
+  function collectBlogFromText(includeWidget){
+    const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
+      .filter(el => includeWidget || !isInsideWidget(el))
       .filter(el => {
         const t = (el.textContent || "").trim();
         return t.length >= 10 && t.length <= 12000;
@@ -1004,18 +1010,19 @@
     return out;
   }
 
-  function collectFaqFromSection(includeWidget){
-    const start = findFaqHeading(includeWidget);
+  function collectFaqFromSection(includeWidget = false){
   function collectFaqFromSection(){
     const start = findFaqHeading();
+  function collectFaqFromSection(includeWidget){
+    const start = findFaqHeading(includeWidget);
     if(!start) return [];
     const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
 
     const out = [];
 
     // Prefer <details>
-    const details = Array.from(section.querySelectorAll("details")).filter(d => includeWidget || !isInsideWidget(d));
     const details = Array.from(section.querySelectorAll("details")).filter(d => !isInsideWidget(d));
+    const details = Array.from(section.querySelectorAll("details")).filter(d => includeWidget || !isInsideWidget(d));
     if(details.length){
       details.forEach(d => {
         const sum = d.querySelector("summary");
@@ -1037,8 +1044,8 @@
     }
 
     // Fallback: h3/h4/strong questions
-    const all = Array.from(section.querySelectorAll("*")).filter(el => includeWidget || !isInsideWidget(el));
     const all = Array.from(section.querySelectorAll("*")).filter(el => !isInsideWidget(el));
+    const all = Array.from(section.querySelectorAll("*")).filter(el => includeWidget || !isInsideWidget(el));
     const startIdx = all.indexOf(start);
     if(startIdx < 0) return [];
     const after = all.slice(startIdx + 1);
@@ -1127,6 +1134,41 @@
       return text;
     }catch(e){
       return "";
+    }
+  }
+
+  async function fetchBlogIndex(){
+    try{
+      const url = absolutize("/blog/");
+      const r = await fetch(url, { method:"GET" });
+      if(!r.ok) return [];
+      const html = await r.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const anchors = Array.from(doc.querySelectorAll("a[href]"));
+      const out = [];
+
+      anchors.forEach(a => {
+        const href = (a.getAttribute("href") || "").trim();
+        if(!href) return;
+        const abs = absolutize(href);
+        if(!isBlogPostUrl(abs)) return;
+        const title = (a.textContent || "").trim() || slugFromUrl(abs);
+        out.push({
+          kind:"blog",
+          id:"blog:" + abs,
+          url: abs,
+          title,
+          excerpt: "Artikel öffnen",
+          fullText: "",
+          isFullLoaded: false,
+          img: PLACEHOLDER_IMG,
+          blob: normalize([title, slugFromUrl(abs), abs].join(" "))
+        });
+      });
+
+      return uniqBy(out, x => x.id);
+    }catch(e){
+      return [];
     }
   }
 
@@ -1221,10 +1263,10 @@
       card.innerHTML = `
         <div class="ecpt-popimg" style="background-image:url('${escapeHtml(imgUrl)}');"></div>
         <div class="ecpt-popbody">
-          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
-          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
           <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 60))}</p>
           <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 80))}</p>
+          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
+          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
         </div>
       `;
       card.addEventListener("click", () => {
@@ -1844,9 +1886,6 @@
           (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKonnte ich dein Anliegen klären?",
           [],
           { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
-          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?",
-          [],
-          { prefixNodes: [btn] }
         );
         return;
       }
@@ -1887,25 +1926,21 @@
         excerpt + "\n\nKonnte ich dein Anliegen klären?",
         [],
         { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
-        excerpt + "\n\nKann ich dir noch weiterhelfen?",
-        [],
-        { prefixNodes: [btn] }
       );
       return;
     }
 
     lastBotAskedMore = true;
-    botTypewriter(
-      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
-      [],
-      { appendNodes: [createQuestionForm(q)] }
     const createBtn = mkBtn("Neue Frage stellen", "accent", true);
     createBtn.onclick = () => openNewQuestionForm(q, "requireDetails");
-    lastBotAskedMore = true;
     botTypewriter(
       "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?",
       [],
       { appendNodes: [createBtn] }
+    botTypewriter(
+      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
+      [],
+      { appendNodes: [createQuestionForm(q)] }
     );
   }
 
@@ -1986,6 +2021,10 @@
      Build index + start fulltext fetching
      ========================================================== */
   function rebuildIndex(){
+    blogItems = uniqBy([...collectBlogFromAnchors(), ...collectBlogFromText()], x => x.id);
+    faqItems = collectFaqFromSection();
+    items = uniqBy([...blogItems, ...faqItems], x => x.id);
+
     blogItems = uniqBy([...collectBlogFromAnchors(false), ...collectBlogFromText(false)], x => x.id);
     faqItems = collectFaqFromSection(false);
     items = uniqBy([...blogItems, ...faqItems], x => x.id);
@@ -1995,10 +2034,6 @@
       faqItems = collectFaqFromSection(true);
       items = uniqBy([...blogItems, ...faqItems], x => x.id);
     }
-
-    blogItems = uniqBy([...collectBlogFromAnchors(), ...collectBlogFromText()], x => x.id);
-    faqItems = collectFaqFromSection();
-    items = uniqBy([...blogItems, ...faqItems], x => x.id);
 
     // preload cached blog texts into blob so search works immediately
     blogItems.forEach(b => {
@@ -2017,6 +2052,17 @@
 
     // keep dropdown synced if user already typed
     if(currentQuery && currentQuery.length >= 2) updateSuggestionDropdown(currentQuery);
+
+    if(!items.length){
+      fetchBlogIndex().then(remoteBlogs => {
+        if(!remoteBlogs.length) return;
+        blogItems = uniqBy([...blogItems, ...remoteBlogs], x => x.id);
+        items = uniqBy([...blogItems, ...faqItems], x => x.id);
+        renderPopular();
+        scheduleFullTextFetch();
+        if(currentQuery && currentQuery.length >= 2) updateSuggestionDropdown(currentQuery);
+      });
+    }
   }
 
   /* Squarespace late content observer */
