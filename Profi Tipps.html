@@ -70,14 +70,12 @@
     <div id="ecptResultsWrap" class="ecpt-results"></div>
 
     <!-- Beliebte Artikel -->
-    <div class="ecpt-rowbar">
-      <div class="ecpt-rowbar-left">
-        <div class="ecpt-rowbar-title">
-          <h2>Beliebte Artikel</h2>
-          <div class="ecpt-muted">Top 3 meistgesuchte Artikel oder FAQs.</div>
-        </div>
-        <div class="ecpt-popular" id="ecptPopular"></div>
+    <div class="ecpt-popular-block">
+      <div class="ecpt-section-head">
+        <h2>Beliebte Artikel</h2>
+        <div class="ecpt-muted">Top 3 meistgesuchte Artikel oder FAQs.</div>
       </div>
+      <div class="ecpt-popular" id="ecptPopular"></div>
     </div>
 
     <!-- Nichts passendes gefunden? (Panel klappt auf – wird zusätzlich als Dropdown-Vorschlag angeboten, wenn 0 Treffer) -->
@@ -322,6 +320,17 @@
   #ecpt .ecpt-line .d{ margin:0; color:var(--muted); font-weight:850; line-height:1.35; }
 
   /* Popular tiles – Safari flicker fix */
+  #ecpt h2{ margin:0; font-size:1.4rem; }
+  #ecpt .ecpt-popular-block{ margin:18px 0 18px; }
+
+  #ecpt .ecpt-popular{
+    display:flex;
+    flex-direction:column;
+    gap:12px;
+    padding-bottom: 6px;
+  }
+  #ecpt .ecpt-popcard{
+    width:100%;
   #ecpt .ecpt-rowbar{
     margin:18px 0 18px;
     display:flex;
@@ -660,6 +669,15 @@
     for(const x of arr){ const k = keyFn(x); if(seen.has(k)) continue; seen.add(k); out.push(x); }
     return out;
   }
+  function uniqStrings(arr){
+    const seen = new Set();
+    return arr.filter(val => {
+      const key = normalize(val || "");
+      if(!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
   function hashId(s){
     const t = normalize(s); let h = 0;
     for(let i=0;i<t.length;i++) h = ((h<<5)-h) + t.charCodeAt(i), h|=0;
@@ -692,14 +710,46 @@
       });
     return candidates[0] || null;
   }
-  function scrollToFaq(){
-    const h = findFaqHeading();
-    if(!h) return;
-    h.scrollIntoView({ behavior:"smooth", block:"start" });
+  function findFaqTarget(question){
+    const start = findFaqHeading();
+    if(!start) return null;
+    const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
+    if(!question) return { section };
+
+    const qNorm = normalize(question);
+    const details = Array.from(section.querySelectorAll("details")).filter(d => !isInsideWidget(d));
+    for(const d of details){
+      const sum = d.querySelector("summary");
+      const text = (sum?.textContent || "").trim();
+      if(text && normalize(text).includes(qNorm)){
+        return { section, details: d, summary: sum || d };
+      }
+    }
+
+    const headings = Array.from(section.querySelectorAll("h3,h4,strong")).filter(el => !isInsideWidget(el));
+    for(const h of headings){
+      const text = (h.textContent || "").trim();
+      if(text && normalize(text).includes(qNorm)){
+        return { section, heading: h };
+      }
+    }
+
+    return { section };
+  }
+
+  function scrollToFaq(question){
+    const target = findFaqTarget(question);
+    if(!target) return;
+    const el = target.summary || target.heading || target.section;
+    if(!el) return;
+    if(target.details && !target.details.open){
+      target.details.open = true;
+    }
+    el.scrollIntoView({ behavior:"smooth", block:"start" });
     // small highlight flash
-    const old = h.style.boxShadow;
-    h.style.boxShadow = "0 0 0 4px rgba(131,60,207,0.25)";
-    setTimeout(()=>{ h.style.boxShadow = old || ""; }, 900);
+    const old = el.style.boxShadow;
+    el.style.boxShadow = "0 0 0 4px rgba(131,60,207,0.25)";
+    setTimeout(()=>{ el.style.boxShadow = old || ""; }, 900);
   }
 
   /* ==========================================================
@@ -1098,7 +1148,7 @@
       card.addEventListener("click", () => {
         bumpPopularity(it.id);
         if(it.kind === "blog") window.location.href = it.url;
-        else scrollToFaq();
+        else scrollToFaq(it.title);
       });
       els.popular.appendChild(card);
     });
@@ -1159,7 +1209,7 @@
     els.helpInput.value = q || "";
     els.helpPanel.style.display = "";
     // scroll a bit to results section for context
-    els.resultsWrap.scrollIntoView({ behavior:"smooth", block:"start" });
+    els.resultsMeta.scrollIntoView({ behavior:"smooth", block:"start" });
   }
 
   function updateSuggestionDropdown(query){
@@ -1215,7 +1265,7 @@
           window.location.href = m.url;
         } else {
           // (5) FAQ click scroll to FAQs section
-          scrollToFaq();
+          scrollToFaq(m.title);
         }
       });
       els.suggestions.appendChild(row);
@@ -1273,7 +1323,7 @@
       card.addEventListener("click", () => {
         bumpPopularity(m.id);
         if(m.kind === "blog") window.location.href = m.url;
-        else scrollToFaq();
+        else scrollToFaq(m.title);
       });
       els.resultsWrap.appendChild(card);
     });
@@ -1282,7 +1332,7 @@
 
     // on live update, avoid aggressive scroll jumps
     if(!(opts && opts.liveUpdate)){
-      els.resultsWrap.scrollIntoView({ behavior:"smooth", block:"start" });
+      els.resultsMeta.scrollIntoView({ behavior:"smooth", block:"start" });
     }
   }
 
@@ -1469,22 +1519,42 @@
     return bubble("bot", el);
   }
 
-  function botTypewriter(text, actions){
+  function dedupeSentences(text){
+    const parts = String(text || "").split(/(?<=[.!?])\s+/);
+    const seen = new Set();
+    const out = [];
+    for(const part of parts){
+      const key = normalize(part);
+      if(!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(part);
+    }
+    return out.join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  function botTypewriter(text, actions, opts){
     const typingWrap = typingBubble();
     setTimeout(() => {
       const msg = typingWrap.querySelector(".ecpt-msg");
       msg.innerHTML = "";
+      if(opts && Array.isArray(opts.prefixNodes)){
+        opts.prefixNodes.forEach(node => {
+          msg.appendChild(node);
+        });
+      }
       const p = document.createElement("div");
       p.style.whiteSpace = "pre-wrap";
       msg.appendChild(p);
 
+      const cleaned = dedupeSentences(text);
+      const words = cleaned.split(/\s+/).filter(Boolean);
       let i = 0;
-      const speed = 8; // (3) faster typing
+      const speed = 45; // faster word-by-word typing
       const tick = () => {
         i++;
-        p.textContent = text.slice(0, i);
+        p.textContent = words.slice(0, i).join(" ");
         els.chatBody.scrollTop = els.chatBody.scrollHeight;
-        if(i < text.length) setTimeout(tick, speed);
+        if(i < words.length) setTimeout(tick, speed);
         else {
           if(actions && actions.length){
             const act = document.createElement("div");
@@ -1526,20 +1596,21 @@
       bumpPopularity(best.id);
 
       if(best.kind === "faq"){
-        // (4) button before answer
+        // (4) button before answer (same message)
         const btn = mkBtn("Mehr Informationen darüber", "outline", true);
-        btn.onclick = () => scrollToFaq();
-        bubble("bot", btn);
-
+        btn.onclick = () => scrollToFaq(best.title);
         lastBotAskedMore = true;
-        botTypewriter((best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?", []);
+        botTypewriter(
+          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?",
+          [],
+          { prefixNodes: [btn] }
+        );
         return;
       }
 
       // blog: fetch full text and respond
       const btn = mkBtn("Mehr Informationen darüber", "outline", true);
       btn.onclick = () => window.location.href = best.url;
-      bubble("bot", btn);
 
       const full = await (async () => {
         const cached = getCachedBlogText(best.url);
@@ -1564,12 +1635,16 @@
         return { p, s };
       }).sort((a,b) => b.s - a.s);
 
-      const excerpt = scored.filter(x => x.s > 0).slice(0, 6).map(x => x.p).join("\n\n").trim()
-        || paras.slice(0, 4).join("\n\n").trim()
+      const excerpt = uniqStrings(scored.filter(x => x.s > 0).slice(0, 6).map(x => x.p)).join("\n\n").trim()
+        || uniqStrings(paras.slice(0, 4)).join("\n\n").trim()
         || "Ich habe einen passenden Artikel gefunden, kann den Inhalt aber gerade nicht sauber auslesen. Möchtest du den Artikel öffnen?";
 
       lastBotAskedMore = true;
-      botTypewriter(excerpt + "\n\nKann ich dir noch weiterhelfen?", []);
+      botTypewriter(
+        excerpt + "\n\nKann ich dir noch weiterhelfen?",
+        [],
+        { prefixNodes: [btn] }
+      );
       return;
     }
 
