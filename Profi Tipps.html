@@ -761,9 +761,6 @@
   }
 
   /* ---------- FAQ scroll (5) ---------- */
-  function findFaqHeading(includeWidget){
-    const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
-      .filter(el => includeWidget || !isInsideWidget(el))
   function findFaqHeading(){
     const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
       .filter(el => !isInsideWidget(el))
@@ -774,7 +771,6 @@
     return candidates[0] || null;
   }
   function findFaqTarget(question){
-    const start = findFaqHeading(false);
     const start = findFaqHeading();
     if(!start) return null;
     const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
@@ -921,9 +917,8 @@
     return { title: title.trim(), excerpt: clampStr(excerpt || "", 260) };
   }
 
-  function collectBlogFromAnchors(includeWidget){
-    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => includeWidget || !isInsideWidget(a));
   function collectBlogFromAnchors(){
+    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
     const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => !isInsideWidget(a));
     const out = [];
     for(const a of anchors){
@@ -951,9 +946,6 @@
     return out;
   }
 
-  function collectBlogFromText(includeWidget){
-    const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
-      .filter(el => includeWidget || !isInsideWidget(el))
   function collectBlogFromText(){
     const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
       .filter(el => !isInsideWidget(el))
@@ -1004,8 +996,6 @@
     return out;
   }
 
-  function collectFaqFromSection(includeWidget){
-    const start = findFaqHeading(includeWidget);
   function collectFaqFromSection(){
     const start = findFaqHeading();
     if(!start) return [];
@@ -1014,7 +1004,6 @@
     const out = [];
 
     // Prefer <details>
-    const details = Array.from(section.querySelectorAll("details")).filter(d => includeWidget || !isInsideWidget(d));
     const details = Array.from(section.querySelectorAll("details")).filter(d => !isInsideWidget(d));
     if(details.length){
       details.forEach(d => {
@@ -1037,7 +1026,6 @@
     }
 
     // Fallback: h3/h4/strong questions
-    const all = Array.from(section.querySelectorAll("*")).filter(el => includeWidget || !isInsideWidget(el));
     const all = Array.from(section.querySelectorAll("*")).filter(el => !isInsideWidget(el));
     const startIdx = all.indexOf(start);
     if(startIdx < 0) return [];
@@ -1879,9 +1867,6 @@
           (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKonnte ich dein Anliegen klären?",
           [],
           { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
-          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?",
-          [],
-          { prefixNodes: [btn] }
         );
         return;
       }
@@ -1922,21 +1907,13 @@
         excerpt + "\n\nKonnte ich dein Anliegen klären?",
         [],
         { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
-        excerpt + "\n\nKann ich dir noch weiterhelfen?",
-        [],
-        { prefixNodes: [btn] }
       );
       return;
     }
 
     lastBotAskedMore = true;
-    botTypewriter(
-      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
-      [],
-      { appendNodes: [createQuestionForm(q)] }
     const createBtn = mkBtn("Neue Frage stellen", "accent", true);
     createBtn.onclick = () => openNewQuestionForm(q, "requireDetails");
-    lastBotAskedMore = true;
     botTypewriter(
       "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?",
       [],
@@ -2021,16 +1998,6 @@
      Build index + start fulltext fetching
      ========================================================== */
   function rebuildIndex(){
-    blogItems = uniqBy([...collectBlogFromAnchors(false), ...collectBlogFromText(false)], x => x.id);
-    faqItems = collectFaqFromSection(false);
-    items = uniqBy([...blogItems, ...faqItems], x => x.id);
-
-    if(!items.length){
-      blogItems = uniqBy([...collectBlogFromAnchors(true), ...collectBlogFromText(true)], x => x.id);
-      faqItems = collectFaqFromSection(true);
-      items = uniqBy([...blogItems, ...faqItems], x => x.id);
-    }
-
     blogItems = uniqBy([...collectBlogFromAnchors(), ...collectBlogFromText()], x => x.id);
     faqItems = collectFaqFromSection();
     items = uniqBy([...blogItems, ...faqItems], x => x.id);
