@@ -331,6 +331,29 @@
   }
   #ecpt .ecpt-popcard{
     width:100%;
+  #ecpt .ecpt-rowbar{
+    margin:18px 0 18px;
+    display:flex;
+    justify-content:space-between;
+    gap:18px;
+    align-items:flex-start;
+    flex-wrap:wrap;
+  }
+  #ecpt .ecpt-rowbar-left{ flex: 1 1 700px; }
+  #ecpt .ecpt-rowbar-title{
+    display:flex; justify-content:space-between; gap:14px; align-items:baseline; flex-wrap:wrap; margin-bottom:10px;
+  }
+  #ecpt h2{ margin:0; font-size:1.4rem; }
+
+  #ecpt .ecpt-popular{
+    display:flex;
+    flex-wrap:nowrap;
+    gap:12px;
+    overflow-x:auto;
+    padding-bottom: 6px;
+  }
+  #ecpt .ecpt-popcard{
+    flex: 0 0 210px;
     background:#fff;
     border:1px solid var(--line);
     border-radius: 18px;
