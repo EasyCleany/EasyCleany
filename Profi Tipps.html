@@ -1,0 +1,2042 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profi Tipps | Easy Cleany</title>
+  <style>
+    body{
+      margin:0;
+      padding:24px 18px 60px;
+      background:#eef4f2;
+      font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+    }
+  </style>
+</head>
+<body>
+<div id="ecpt" class="ecpt">
+  <header class="ecpt-topbar">
+    <a class="ecpt-brand" href="/" aria-label="Easy Cleany Startseite">
+      <span class="ecpt-brand-mark">easy</span><span class="ecpt-brand-strong">cleany</span><span class="ecpt-brand-dot">•</span>
+    </a>
+    <button class="ecpt-topbtn" id="ecptOpenQTopBtn" type="button">OFFENE FRAGEN</button>
+  </header>
+
+  <section class="ecpt-hero" aria-labelledby="ecptHeroTitle">
+    <div class="ecpt-container ecpt-hero-inner">
+      <h1 id="ecptHeroTitle">Wie können wir heute weiterhelfen?</h1>
+
+      <div class="ecpt-search-wrap">
+        <div class="ecpt-searchbar">
+          <span class="ecpt-search-icon" aria-hidden="true">🔍</span>
+          <input id="ecptSearchInput" type="search" placeholder="Suchbegriff eingeben (z.B. Backofen, Kalk, Übergabe…)"
+                 autocomplete="off" aria-label="Suche" aria-expanded="false" aria-controls="ecptSuggestions" />
+          <button id="ecptSearchBtn" class="ecpt-btn ecpt-btn-accent" type="button">Suchen</button>
+          <button id="ecptAiBtn" class="ecpt-btn ecpt-btn-outline" type="button" aria-pressed="false">KI Fragen</button>
+        </div>
+
+        <!-- Dropdown Vorschläge -->
+        <div id="ecptSuggestions" class="ecpt-suggestions" role="listbox" aria-label="Suchvorschläge"></div>
+
+        <!-- Eleny Chat -->
+        <div class="ecpt-chat" id="ecptChat" aria-hidden="true">
+          <div class="ecpt-chat-head">
+            <div class="ecpt-chat-title">
+              <span class="ecpt-pill">Eleny</span>
+              <span class="ecpt-muted">Ich suche in euren Blogartikeln & FAQs dieser Seite – und formuliere eine vollständige Antwort.</span>
+            </div>
+            <button class="ecpt-icon-btn" id="ecptChatClose" type="button" aria-label="Chat schliessen">✕</button>
+          </div>
+
+          <div class="ecpt-chat-body" id="ecptChatBody" aria-live="polite"></div>
+
+          <div class="ecpt-chat-input">
+            <textarea id="ecptChatInput" rows="2" placeholder="Schreib deine Frage…" aria-label="Frage an Eleny"></textarea>
+            <button id="ecptChatSend" class="ecpt-btn ecpt-btn-accent" type="button">Senden</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- SEARCH VIEW -->
+  <section class="ecpt-container ecpt-view" id="ecptViewSearch">
+    <div class="ecpt-section-head ecpt-results-head">
+      <div class="ecpt-results-head-left">
+        <h2>Suchergebnisse</h2>
+        <div class="ecpt-muted" id="ecptResultsMeta">Gib oben einen Begriff ein.</div>
+      </div>
+      <aside class="ecpt-popular-block">
+        <div class="ecpt-popular-title">Meistgesuchte Artikel</div>
+        <div class="ecpt-popular-sub">Top 4 Artikel oder FAQs.</div>
+        <div class="ecpt-popular" id="ecptPopular"></div>
+      </aside>
+    </div>
+
+    <!-- Ergebnisliste: max. 3 Treffer, je 2 Zeilen -->
+    <div id="ecptResultsWrap" class="ecpt-results"></div>
+
+    <!-- Nichts passendes gefunden? (Panel klappt auf – wird zusätzlich als Dropdown-Vorschlag angeboten, wenn 0 Treffer) -->
+    <div class="ecpt-help" id="ecptHelp" style="display:none;">
+      <button class="ecpt-help-toggle" id="ecptHelpToggle" type="button">Nichts passendes gefunden?</button>
+      <div class="ecpt-help-panel" id="ecptHelpPanel" style="display:none;">
+        <div class="ecpt-help-row">
+          <input id="ecptHelpInput" class="ecpt-input" type="text" placeholder="Schreib deine Frage oder deinen Suchbegriff…" />
+          <button id="ecptHelpAi" class="ecpt-btn ecpt-btn-outline" type="button">KI Fragen</button>
+          <button id="ecptHelpNewQ" class="ecpt-btn ecpt-btn-accent" type="button">Neue Frage stellen</button>
+        </div>
+        <div class="ecpt-muted ecpt-small">„Neue Frage stellen“ öffnet die Maske bei „Offene Fragen“. Titel ist vorausgefüllt – Details musst du noch ergänzen.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- OFFENE FRAGEN VIEW -->
+  <section class="ecpt-container ecpt-view" id="ecptViewOpenQ" style="display:none;">
+    <div class="ecpt-articlebar">
+      <button class="ecpt-btn ecpt-btn-outline" id="ecptBackToSearch" type="button">← Zurück</button>
+      <button class="ecpt-btn ecpt-btn-accent" id="ecptOpenQCreateBtn" type="button">Neue Frage stellen</button>
+    </div>
+
+    <div class="ecpt-openq-form" id="ecptOpenQForm" style="display:none;">
+      <div class="ecpt-formgrid">
+        <label class="ecpt-label">
+          <span>Titel</span>
+          <input id="ecptOpenQTitle" class="ecpt-input" type="text" />
+        </label>
+
+        <label class="ecpt-label ecpt-span2">
+          <span>Frage / Beschreibung</span>
+          <textarea id="ecptOpenQBody" class="ecpt-input" rows="6" placeholder="Bitte hier konkret beschreiben…"></textarea>
+        </label>
+      </div>
+
+      <div class="ecpt-actions-right">
+        <button id="ecptOpenQDelete" class="ecpt-btn ecpt-btn-outline" type="button">Löschen</button>
+        <button id="ecptOpenQSubmit" class="ecpt-btn ecpt-btn-accent" type="button">Abschicken</button>
+      </div>
+
+      <div id="ecptOpenQNote" class="ecpt-muted ecpt-small" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="ecpt-openq-card">
+      <div class="ecpt-openq-head">
+        <div>
+          <h2 style="margin:0;">Offene Fragen</h2>
+          <div class="ecpt-muted">Öffentlich sichtbar (wenn Endpoint konfiguriert) / sonst lokal im Browser.</div>
+        </div>
+      </div>
+      <div id="ecptOpenQList" class="ecpt-openq-list"></div>
+    </div>
+  </section>
+</div>
+
+<style>
+  #ecpt{
+    --bg:#f6faf9;
+    --text:#0f1a17;
+    --muted:#5a6b66;
+    --line:#e6eeeb;
+
+    --accent:#833CCF;
+    --accent2:#2a0a4a; /* dunkles violett */
+    --soft:rgba(131,60,207,0.12);
+    --soft2:rgba(131,60,207,0.07);
+
+    --shadow: 0 10px 30px rgba(15,26,23,.08);
+
+    color:var(--text);
+    background:var(--bg);
+    border-radius: 18px;
+    overflow:hidden;
+    border:1px solid var(--line);
+    font-family: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, "Noto Sans", "Helvetica Neue", sans-serif;
+  }
+  #ecpt *{ box-sizing:border-box; }
+  #ecpt a{ color:inherit; text-decoration:none; }
+  #ecpt .ecpt-container{ width:min(1100px, calc(100% - 40px)); margin:0 auto; }
+
+  /* Topbar */
+  #ecpt .ecpt-topbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(246,250,249,0.92);
+    backdrop-filter: blur(10px);
+    border-bottom:1px solid var(--line);
+    display:flex; align-items:center; justify-content:space-between;
+    padding:14px 20px;
+  }
+  #ecpt .ecpt-brand{ display:flex; align-items:baseline; gap:2px; letter-spacing:.2px; font-weight:700; }
+  #ecpt .ecpt-brand-mark{ font-weight:600; color:var(--muted); }
+  #ecpt .ecpt-brand-strong{ font-weight:800; color:var(--text); }
+  #ecpt .ecpt-brand-dot{ color:var(--accent); margin-left:2px; }
+  #ecpt .ecpt-topbtn{
+    border:none; background:transparent;
+    font-weight:950; color:var(--accent);
+    letter-spacing:.08em; font-size:.86rem;
+    cursor:pointer; padding:10px 12px; border-radius:12px;
+  }
+  #ecpt .ecpt-topbtn:hover{ background:var(--soft2); }
+
+  /* Hero */
+  #ecpt .ecpt-hero{
+    background:
+      radial-gradient(900px 400px at 50% 0%, rgba(131,60,207,.26), rgba(95,46,154,.92)),
+      linear-gradient(180deg, rgba(95,46,154,.96), rgba(15,26,23,.92));
+    color:#fff;
+    padding:64px 0 34px;
+    border-bottom:1px solid rgba(255,255,255,.12);
+  }
+  #ecpt .ecpt-hero-inner{ display:flex; flex-direction:column; align-items:center; text-align:center; }
+  #ecpt .ecpt-hero h1{
+    margin:0 0 22px;
+    font-size: clamp(2rem, 3.6vw, 3.2rem);
+    line-height:1.08;
+    font-weight:950;
+    color:#fff;
+  }
+
+  /* Search */
+  #ecpt .ecpt-search-wrap{ width:min(920px, 100%); position:relative; }
+  #ecpt .ecpt-searchbar{
+    display:flex; align-items:center; gap:10px;
+    background:rgba(255,255,255,.95);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:14px;
+    padding:10px 10px 10px 12px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.25);
+  }
+  #ecpt .ecpt-search-icon{ opacity:.7; }
+  #ecpt .ecpt-searchbar input{
+    flex:1;
+    border:none; outline:none;
+    font-size:1rem;
+    padding:10px 8px;
+    background:transparent;
+    color:var(--text);
+    min-width: 220px;
+  }
+  #ecpt .ecpt-btn{
+    border:none;
+    border-radius:12px;
+    padding:12px 16px;
+    font-weight:950;
+    cursor:pointer;
+    white-space:nowrap;
+    display:inline-flex;
+    align-items:center;
+    justify-content:center;
+  }
+  #ecpt .ecpt-btn-accent{ background:var(--accent); color:#fff; }
+  #ecpt .ecpt-btn-accent:hover{ filter:brightness(.96); }
+  #ecpt .ecpt-btn-outline{
+    background:transparent;
+    color:var(--accent2);
+    border:1px solid rgba(131,60,207,.35);
+  }
+  #ecpt .ecpt-btn-outline:hover{ background:var(--soft2); }
+  #ecpt .ecpt-btn-small{
+    padding:8px 10px;
+    border-radius:10px;
+    font-size:.9rem;
+    font-weight:950;
+  }
+  #ecpt .ecpt-icon-btn{
+    border:none;
+    background: var(--soft2);
+    border:1px solid rgba(131,60,207,.18);
+    color: var(--accent2);
+    width:40px; height:40px;
+    border-radius: 14px;
+    font-weight:950;
+    cursor:pointer;
+  }
+  #ecpt .ecpt-pill{
+    display:inline-flex;
+    align-items:center;
+    background: var(--soft2);
+    border:1px solid rgba(131,60,207,.18);
+    color: var(--accent2);
+    padding:6px 10px;
+    border-radius: 999px;
+    font-weight:950;
+    font-size:.82rem;
+    width: fit-content;
+  }
+  #ecpt .ecpt-muted{ color:var(--muted); font-weight:800; }
+
+  /* Suggestions dropdown */
+  #ecpt .ecpt-suggestions{
+    position:absolute;
+    left:0; right:0;
+    margin-top:10px;
+    background: rgba(255,255,255,.98);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:14px;
+    overflow:hidden;
+    box-shadow: 0 18px 60px rgba(0,0,0,.20);
+    display:none;
+    text-align:left;
+    z-index: 60;
+  }
+  #ecpt .ecpt-suggestion{
+    padding:12px 14px;
+    cursor:pointer;
+    border-top:1px solid rgba(230,238,235,.8);
+  }
+  #ecpt .ecpt-suggestion:first-child{ border-top:none; }
+  #ecpt .ecpt-suggestion:hover{ background: var(--soft); }
+  #ecpt .ecpt-suggestion-title{ font-weight:950; color: var(--accent2); display:flex; gap:8px; align-items:center; }
+  #ecpt .ecpt-suggestion-meta{ font-size:.88rem; color:var(--muted); font-weight:850; margin-top:2px; }
+  #ecpt .ecpt-badge{
+    display:inline-flex;
+    align-items:center;
+    padding:4px 8px;
+    border-radius:999px;
+    font-weight:950;
+    font-size:.78rem;
+    background:var(--soft2);
+    border:1px solid rgba(131,60,207,.18);
+    color:var(--accent2);
+  }
+
+  /* Search results list */
+  #ecpt .ecpt-section-head{
+    display:flex; align-items:baseline; justify-content:space-between;
+    gap:16px; margin: 22px 0 10px;
+    flex-wrap:wrap;
+  }
+  #ecpt .ecpt-results-head{
+    align-items:flex-start;
+    gap:24px;
+  }
+  #ecpt .ecpt-results-head-left{
+    flex:1 1 auto;
+    max-width:none;
+  }
+  #ecpt .ecpt-popular-block{
+    margin-left:auto;
+    margin-right:0;
+    flex:0 0 360px;
+    align-self:flex-start;
+    background:rgba(255,255,255,.9);
+    border:1px solid var(--line);
+    border-radius:16px;
+    padding:12px;
+    box-shadow: 0 8px 20px rgba(15,26,23,.05);
+  }
+  #ecpt .ecpt-popular-title{
+    font-weight:950;
+    color:var(--accent2);
+    margin-bottom:2px;
+  }
+  #ecpt .ecpt-popular-sub{
+    color:var(--muted);
+    font-weight:800;
+    font-size:.82rem;
+    margin-bottom:10px;
+  }
+  #ecpt .ecpt-results{ display:flex; flex-direction:column; gap:10px; padding-bottom: 10px; }
+  #ecpt #ecptResultsWrap{
+    width:100%;
+    max-width:none;
+    margin-top:6px;
+  }
+  #ecpt .ecpt-line{
+    background:#fff;
+    border:1px solid rgba(230,238,235,.95);
+    border-radius: 16px;
+    padding:14px;
+    box-shadow: 0 8px 20px rgba(15,26,23,.05);
+    cursor:pointer;
+  }
+  #ecpt .ecpt-line:hover{ border-color: rgba(131,60,207,.35); }
+  #ecpt .ecpt-line .t{ font-weight:950; margin:0 0 6px; color: var(--accent2); }
+  #ecpt .ecpt-line .d{ margin:0; color:var(--muted); font-weight:850; line-height:1.35; }
+
+  /* Popular tiles – Safari flicker fix */
+  #ecpt h2{ margin:0; font-size:1.4rem; }
+
+  #ecpt .ecpt-popular{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap:0;
+    padding-bottom: 2px;
+  }
+  #ecpt .ecpt-popcard{
+    width:100%;
+    aspect-ratio: 4 / 3;
+    background:#fff;
+    border:1px solid var(--line);
+    border-radius: 18px;
+    box-shadow: var(--shadow);
+    cursor:pointer;
+    overflow:hidden;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+    will-change: transform;
+    transition: transform .18s ease, border-color .18s ease;
+  }
+  #ecpt .ecpt-popcard:hover{
+    transform: translate3d(0,-3px,0);
+    border-color: rgba(131,60,207,.35);
+  }
+  #ecpt .ecpt-popimg{
+    width:100%;
+    height:58%;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+    transform: translateZ(0);
+    -webkit-transform: translateZ(0);
+    backface-visibility: hidden;
+    -webkit-backface-visibility: hidden;
+  }
+  #ecpt .ecpt-popbody{
+    padding:10px 12px 12px;
+    text-align:left;
+    height:45%;
+    display:flex;
+    flex-direction:column;
+    justify-content:center;
+  }
+  #ecpt .ecpt-poptitle{
+    font-weight:950;
+    line-height:1.25;
+    font-size:.98rem;
+    margin:0;
+    color: var(--accent2);
+  }
+  #ecpt .ecpt-popdesc{
+    margin:6px 0 0;
+    color:var(--muted);
+    font-weight:600;
+    font-size:.76rem;
+    line-height:1.3;
+  }
+
+  /* Help */
+  #ecpt .ecpt-help{
+    margin: 10px 0 26px;
+    background:#fff;
+    border:1px solid rgba(230,238,235,.95);
+    border-radius: 18px;
+    padding:12px;
+    box-shadow: var(--shadow);
+  }
+  #ecpt .ecpt-help-toggle{
+    width:100%;
+    border:none;
+    background: var(--soft2);
+    border:1px solid rgba(131,60,207,.18);
+    color: var(--accent2);
+    font-weight: 950;
+    padding: 12px 14px;
+    border-radius: 14px;
+    cursor:pointer;
+    text-align:left;
+  }
+  #ecpt .ecpt-help-toggle:hover{ background: var(--soft); }
+  #ecpt .ecpt-help-row{
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    align-items:center;
+    margin-top: 12px;
+  }
+  #ecpt .ecpt-input{
+    border-radius:12px;
+    border:1px solid rgba(131,60,207,.22);
+    padding:10px 10px;
+    outline:none;
+    font-size:1rem;
+    width:100%;
+  }
+  #ecpt #ecptHelpInput{ flex: 1 1 360px; }
+  #ecpt .ecpt-small{ font-size:.92rem; margin-top:8px; }
+
+  /* Open questions + chat (kept compact) */
+  #ecpt .ecpt-articlebar{
+    margin:22px 0 12px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+    justify-content:space-between;
+    align-items:center;
+  }
+  #ecpt .ecpt-openq-card{
+    background:#fff;
+    border:1px solid rgba(230,238,235,.95);
+    border-radius: 18px;
+    padding:16px;
+    box-shadow: var(--shadow);
+    margin-bottom: 26px;
+  }
+  #ecpt .ecpt-openq-form{
+    border:1px dashed rgba(131,60,207,.25);
+    border-radius: 16px;
+    padding: 12px;
+    background: rgba(131,60,207,.04);
+    margin: 10px 0 14px;
+  }
+  #ecpt .ecpt-formgrid{
+    display:grid;
+    grid-template-columns: repeat(2, minmax(0,1fr));
+    gap:12px;
+    margin: 6px 0 12px;
+  }
+  #ecpt .ecpt-span2{ grid-column: 1 / -1; }
+  #ecpt .ecpt-label{ display:flex; flex-direction:column; gap:6px; font-weight:950; }
+  #ecpt .ecpt-label span{ font-size:.9rem; color:var(--muted); font-weight:900; }
+  #ecpt .ecpt-actions-right{
+    display:flex; gap:10px; justify-content:flex-end; flex-wrap:wrap;
+  }
+  #ecpt .ecpt-openq-list{ display:flex; flex-direction:column; gap:10px; }
+  #ecpt .ecpt-openq-item{
+    border:1px solid rgba(230,238,235,.95);
+    border-radius: 14px;
+    padding:12px;
+    background: rgba(15,26,23,.02);
+  }
+  #ecpt .ecpt-openq-item .t{ font-weight:950; margin:0 0 6px; color: var(--accent2); }
+  #ecpt .ecpt-openq-item .b{ margin:0; color:var(--muted); font-weight:850; line-height:1.45; white-space:pre-wrap; }
+  #ecpt .ecpt-openq-item .meta{ margin-top:10px; display:flex; gap:10px; align-items:center; flex-wrap:wrap; }
+  #ecpt .ecpt-status{
+    display:inline-flex; align-items:center; padding:4px 10px; border-radius:999px;
+    font-weight:950; font-size:.85rem;
+    background: rgba(22,163,74,.12); border: 1px solid rgba(22,163,74,.25); color: rgb(22, 101, 52);
+  }
+  #ecpt .ecpt-status.ecpt-answered{
+    background: rgba(220,38,38,.12);
+    border:1px solid rgba(220,38,38,.25);
+    color: rgb(153, 27, 27);
+  }
+  #ecpt .ecpt-dt{ color:var(--muted); font-weight:900; font-size:.86rem; }
+
+  #ecpt .ecpt-chat{
+    margin-top:14px;
+    background: rgba(255,255,255,.96);
+    border:1px solid rgba(255,255,255,.35);
+    border-radius:16px;
+    box-shadow: 0 18px 60px rgba(0,0,0,.20);
+    overflow:hidden;
+    display:none;
+    text-align:left;
+  }
+  #ecpt.ecpt-ai-open .ecpt-chat{ display:block; }
+  #ecpt .ecpt-chat-head{
+    padding:12px 14px;
+    border-bottom:1px solid rgba(230,238,235,.9);
+    display:flex;
+    align-items:flex-start;
+    justify-content:space-between;
+    gap:12px;
+  }
+  #ecpt .ecpt-chat-title{ display:flex; flex-direction:column; gap:6px; }
+  #ecpt .ecpt-chat-body{
+    padding:12px 14px;
+    max-height: 360px;
+    overflow:auto;
+  }
+  #ecpt .ecpt-bubble{ display:flex; margin:10px 0; gap:10px; }
+  #ecpt .ecpt-avatar{
+    width:34px; height:34px; border-radius:12px;
+    display:grid; place-items:center;
+    background: var(--soft2);
+    border:1px solid rgba(131,60,207,.18);
+    color: var(--accent2);
+    font-weight:950;
+    flex:0 0 auto;
+  }
+  #ecpt .ecpt-msg{
+    background:#fff;
+    border:1px solid rgba(230,238,235,.95);
+    border-radius: 14px;
+    padding:10px 12px;
+    box-shadow: 0 8px 20px rgba(15,26,23,.06);
+    line-height:1.55;
+    width:100%;
+    color: var(--text);
+    font-weight:600;
+    font-size:.95rem;
+    white-space: pre-wrap;
+  }
+  #ecpt .ecpt-bubble.ecpt-me{ flex-direction:row-reverse; }
+  #ecpt .ecpt-bubble.ecpt-me .ecpt-msg{
+    border-color: rgba(131,60,207,.18);
+    background: rgba(131,60,207,.06);
+  }
+  #ecpt .ecpt-chat-input{
+    padding:12px 14px;
+    border-top:1px solid rgba(230,238,235,.9);
+    display:flex;
+    gap:10px;
+    align-items:flex-end;
+  }
+  #ecpt .ecpt-chat-input textarea{
+    flex:1;
+    border-radius:12px;
+    border:1px solid rgba(131,60,207,.22);
+    padding:10px 10px;
+    outline:none;
+    resize:vertical;
+    min-height:44px;
+    font-size:1rem;
+  }
+  #ecpt .ecpt-chat-actions{
+    margin-top:10px;
+    display:flex;
+    gap:10px;
+    flex-wrap:wrap;
+  }
+  #ecpt .ecpt-chat-form{
+    margin-top:10px;
+    display:flex;
+    flex-direction:column;
+    gap:10px;
+  }
+  #ecpt .ecpt-chat-form .ecpt-input{
+    width:100%;
+  }
+
+  /* Typing indicator (faster) */
+  #ecpt .ecpt-typing{
+    display:inline-flex;
+    align-items:center;
+    gap:5px;
+    padding:2px 0;
+  }
+  #ecpt .ecpt-dot{
+    width:6px; height:6px; border-radius:999px;
+    background: rgba(15,26,23,.55);
+    animation: ecptPulse .7s infinite;
+  }
+  #ecpt .ecpt-dot:nth-child(2){ animation-delay: .10s; }
+  #ecpt .ecpt-dot:nth-child(3){ animation-delay: .20s; }
+  @keyframes ecptPulse{
+    0%, 80%, 100% { transform: scale(0.75); opacity:.35; }
+    40% { transform: scale(1); opacity:1; }
+  }
+
+  @media (max-width: 560px){
+    #ecpt .ecpt-searchbar{ flex-wrap:wrap; }
+    #ecpt .ecpt-btn{ width:100%; }
+    #ecpt .ecpt-formgrid{ grid-template-columns: 1fr; }
+    #ecpt .ecpt-span2{ grid-column:auto; }
+    #ecpt .ecpt-results-head{
+      flex-direction:column;
+    }
+    #ecpt .ecpt-popular-block{
+      width:100%;
+    }
+    #ecpt .ecpt-popcard{
+      aspect-ratio: 3 / 2;
+    }
+    #ecpt .ecpt-popular{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
+</style>
+
+<script>
+(function(){
+  const root = document.getElementById("ecpt");
+  if(!root) return;
+
+  /* OPTIONAL Backend (public open questions + email) */
+  const ECPT_API_BASE = ""; // keep empty if not used
+  const LS_POP = "ecpt_pop_v4";
+  const LS_BLOGCACHE_PREFIX = "ecpt_blogcache_";
+  const BLOGCACHE_TTL_MS = 1000 * 60 * 60 * 24 * 7; // 7 Tage
+
+  const els = {
+    input: document.getElementById("ecptSearchInput"),
+    searchBtn: document.getElementById("ecptSearchBtn"),
+    aiBtn: document.getElementById("ecptAiBtn"),
+    suggestions: document.getElementById("ecptSuggestions"),
+
+    resultsWrap: document.getElementById("ecptResultsWrap"),
+    resultsMeta: document.getElementById("ecptResultsMeta"),
+
+    popular: document.getElementById("ecptPopular"),
+
+    help: document.getElementById("ecptHelp"),
+    helpToggle: document.getElementById("ecptHelpToggle"),
+    helpPanel: document.getElementById("ecptHelpPanel"),
+    helpInput: document.getElementById("ecptHelpInput"),
+    helpAi: document.getElementById("ecptHelpAi"),
+    helpNewQ: document.getElementById("ecptHelpNewQ"),
+
+    viewSearch: document.getElementById("ecptViewSearch"),
+    viewOpenQ: document.getElementById("ecptViewOpenQ"),
+    openQTopBtn: document.getElementById("ecptOpenQTopBtn"),
+    backToSearch: document.getElementById("ecptBackToSearch"),
+
+    openQCreateBtn: document.getElementById("ecptOpenQCreateBtn"),
+    openQForm: document.getElementById("ecptOpenQForm"),
+    openQTitle: document.getElementById("ecptOpenQTitle"),
+    openQBody: document.getElementById("ecptOpenQBody"),
+    openQSubmit: document.getElementById("ecptOpenQSubmit"),
+    openQDelete: document.getElementById("ecptOpenQDelete"),
+    openQNote: document.getElementById("ecptOpenQNote"),
+    openQList: document.getElementById("ecptOpenQList"),
+
+    chat: document.getElementById("ecptChat"),
+    chatBody: document.getElementById("ecptChatBody"),
+    chatInput: document.getElementById("ecptChatInput"),
+    chatSend: document.getElementById("ecptChatSend"),
+    chatClose: document.getElementById("ecptChatClose"),
+  };
+
+  if(!els.input || !els.searchBtn || !els.aiBtn || !els.suggestions){
+    return;
+  }
+
+  /* ---------- helpers ---------- */
+  function escapeHtml(str){
+    return String(str)
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
+  }
+  function normalize(s){
+    return String(s||"").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+  }
+  function tokenize(q){
+    return normalize(q).split(/[^a-z0-9äöüß]+/i).filter(w => w.length >= 2);
+  }
+  function clampStr(s, n){
+    s = (s||"").trim();
+    return s.length <= n ? s : (s.slice(0, n-1).trim() + "…");
+  }
+  function absolutize(url){ try{ return new URL(url, window.location.href).toString(); } catch(e){ return url; } }
+  function isInsideWidget(el){ return !!(el && el.closest && el.closest("#ecpt")); }
+  function uniqBy(arr, keyFn){
+    const seen = new Set(); const out = [];
+    for(const x of arr){ const k = keyFn(x); if(seen.has(k)) continue; seen.add(k); out.push(x); }
+    return out;
+  }
+  function uniqStrings(arr){
+    const seen = new Set();
+    return arr.filter(val => {
+      const key = normalize(val || "");
+      if(!key || seen.has(key)) return false;
+      seen.add(key);
+      return true;
+    });
+  }
+  function hashId(s){
+    const t = normalize(s); let h = 0;
+    for(let i=0;i<t.length;i++) h = ((h<<5)-h) + t.charCodeAt(i), h|=0;
+    return Math.abs(h).toString(36);
+  }
+  function nowISO(){ return new Date().toISOString(); }
+  function prettyDate(iso){
+    try{ const d=new Date(iso); return d.toLocaleString(undefined,{year:"numeric",month:"2-digit",day:"2-digit",hour:"2-digit",minute:"2-digit"}); }
+    catch(e){ return ""; }
+  }
+  function genTitleFromText(text){
+    const t = (text||"").trim();
+    const words = t.replace(/\s+/g," ").split(" ").slice(0, 10).join(" ");
+    return words ? (words.length < t.length ? (words+"…") : words) : "Neue Frage";
+  }
+
+  function showView(which){
+    els.viewSearch.style.display = (which === "search") ? "" : "none";
+    els.viewOpenQ.style.display = (which === "openq") ? "" : "none";
+    if(which !== "search") setAiOpen(false);
+  }
+
+  /* ---------- FAQ scroll (5) ---------- */
+  function findFaqHeading(includeWidget){
+    const candidates = Array.from(document.querySelectorAll("h1,h2,h3,h4,strong,p,div"))
+      .filter(el => includeWidget || !isInsideWidget(el))
+      .filter(el => {
+        const t = (el.textContent || "").trim();
+        return t && t.length <= 40 && /^faqs$/i.test(t.replace(/\s+/g,""));
+      });
+    return candidates[0] || null;
+  }
+  function findFaqTarget(question){
+    const start = findFaqHeading(false);
+    if(!start) return null;
+    const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
+    if(!question) return { section };
+
+    const qNorm = normalize(question);
+    const details = Array.from(section.querySelectorAll("details")).filter(d => !isInsideWidget(d));
+    for(const d of details){
+      const sum = d.querySelector("summary");
+      const text = (sum?.textContent || "").trim();
+      if(text && normalize(text).includes(qNorm)){
+        return { section, details: d, summary: sum || d };
+      }
+    }
+
+    const headings = Array.from(section.querySelectorAll("h3,h4,strong")).filter(el => !isInsideWidget(el));
+    for(const h of headings){
+      const text = (h.textContent || "").trim();
+      if(text && normalize(text).includes(qNorm)){
+        return { section, heading: h };
+      }
+    }
+
+    return { section };
+  }
+
+  function scrollToFaq(question){
+    const target = findFaqTarget(question);
+    if(!target) return;
+    const el = target.summary || target.heading || target.section;
+    if(!el) return;
+    if(target.summary){
+      target.summary.click();
+    }
+    if(target.details && !target.details.open){
+      target.details.open = true;
+    }
+    if(target.heading){
+      target.heading.click();
+    }
+    el.scrollIntoView({ behavior:"smooth", block:"start" });
+    // small highlight flash
+    const old = el.style.boxShadow;
+    el.style.boxShadow = "0 0 0 4px rgba(131,60,207,0.25)";
+    setTimeout(()=>{ el.style.boxShadow = old || ""; }, 900);
+  }
+
+  /* ==========================================================
+     Indexing: collect blog links + FAQ, then FULLTEXT fetch blog pages
+     ========================================================== */
+  const PLACEHOLDER_IMG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="360">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop stop-color="#833CCF" stop-opacity="0.35" offset="0"/>
+        <stop stop-color="#5f2e9a" stop-opacity="0.08" offset="1"/>
+      </linearGradient></defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <circle cx="85" cy="90" r="38" fill="rgba(255,255,255,0.35)"/>
+      <rect x="150" y="70" width="520" height="28" rx="14" fill="rgba(255,255,255,0.35)"/>
+      <rect x="150" y="115" width="420" height="22" rx="11" fill="rgba(255,255,255,0.28)"/>
+    </svg>
+  `);
+  const FAQ_IMG = "data:image/svg+xml;charset=utf-8," + encodeURIComponent(`
+    <svg xmlns="http://www.w3.org/2000/svg" width="800" height="360">
+      <defs><linearGradient id="g" x1="0" y1="0" x2="1" y2="1">
+        <stop stop-color="#833CCF" stop-opacity="0.28" offset="0"/>
+        <stop stop-color="#5f2e9a" stop-opacity="0.06" offset="1"/>
+      </linearGradient></defs>
+      <rect width="100%" height="100%" fill="url(#g)"/>
+      <text x="70" y="230" font-family="Arial, sans-serif" font-size="160" fill="rgba(255,255,255,0.45)">?</text>
+      <rect x="220" y="120" width="500" height="28" rx="14" fill="rgba(255,255,255,0.35)"/>
+      <rect x="220" y="165" width="380" height="22" rx="11" fill="rgba(255,255,255,0.28)"/>
+    </svg>
+  `);
+
+  function isBlogPostUrl(url){
+    try{
+      const u = new URL(url, window.location.href);
+      const p = (u.pathname || "").toLowerCase();
+      return /(^|\/)blog\/.+/.test(p) && !(p === "/blog" || p === "/blog/");
+    }catch(e){
+      const s = String(url||"");
+      return /(^|\/)blog\/.+/i.test(s) && !/\/blog\/?$/i.test(s);
+    }
+  }
+  function slugFromUrl(url){
+    try{
+      const u = new URL(url, window.location.href);
+      const parts = u.pathname.split("/").filter(Boolean);
+      const i = parts.findIndex(x => x.toLowerCase() === "blog");
+      const slug = (i >= 0 && parts[i+1]) ? parts[i+1] : (parts[parts.length-1] || "blogartikel");
+      return slug.replace(/[-_]/g," ");
+    }catch(e){
+      return String(url||"").split("/").pop().replace(/[-_]/g," ");
+    }
+  }
+  function looksLikeUrlLine(line){
+    const l = (line||"").trim();
+    return /^https?:\/\//i.test(l) || /\/blog\//i.test(l) || /^\/blog\//i.test(l) || /^blog\//i.test(l);
+  }
+  function contextElFor(node){
+    const el = node && node.nodeType === 1 ? node : node?.parentElement;
+    if(!el) return null;
+    return (
+      el.closest("article, .sqs-block, .sqs-block-content, .summary-item, .list-item, .collection-item, section, .content, .page-section") ||
+      el.closest("div, li, p") ||
+      el
+    );
+  }
+  function pickImgFromContext(ctx){
+    const img = ctx?.querySelector?.("img");
+    if(!img) return "";
+    return img.currentSrc || img.src || img.getAttribute("data-src") || "";
+  }
+  function inferTitleExcerptFromContext(url, ctx){
+    const h = ctx?.querySelector?.("h1,h2,h3,h4,strong,.summary-title,.summary-title-link,.list-title,.title");
+    let title = h ? (h.textContent||"").trim() : "";
+
+    const raw = ctx ? (ctx.innerText || ctx.textContent || "") : "";
+    const lines = raw.split("\n").map(x => x.trim()).filter(Boolean);
+
+    const clean = lines.filter(l => {
+      if(!l) return false;
+      const nl = normalize(l), nu = normalize(url);
+      if(nl.includes(nu)) return false;
+      if(looksLikeUrlLine(l)) return false;
+      return true;
+    });
+
+    if(!title){
+      const candidate = clean.find(l => l.length >= 6 && l.length <= 140 && !looksLikeUrlLine(l));
+      title = candidate || "";
+    }
+
+    let excerpt = "";
+    if(clean.length){
+      const idx = clean.findIndex(l => l === title);
+      const rest = (idx >= 0) ? clean.slice(idx + 1) : clean.slice(0);
+      excerpt = rest.join(" ").trim();
+    }
+
+    if(!title) title = slugFromUrl(url);
+    excerpt = excerpt.replace(/\bweiterlesen\b/ig, "").trim();
+    return { title: title.trim(), excerpt: clampStr(excerpt || "", 260) };
+  }
+
+  function collectBlogFromAnchors(includeWidget){
+    const anchors = Array.from(document.querySelectorAll("a[href]")).filter(a => includeWidget || !isInsideWidget(a));
+    const out = [];
+    for(const a of anchors){
+      const href = (a.getAttribute("href") || "").trim();
+      if(!href) continue;
+      const abs = absolutize(href);
+      if(!isBlogPostUrl(abs)) continue;
+
+      const ctx = contextElFor(a);
+      const { title, excerpt } = inferTitleExcerptFromContext(abs, ctx);
+      const img = pickImgFromContext(ctx) || PLACEHOLDER_IMG;
+
+      out.push({
+        kind:"blog",
+        id:"blog:" + abs,
+        url: abs,
+        title,
+        excerpt: excerpt || "",
+        fullText: "",      // will be filled by fetch
+        isFullLoaded: false,
+        img,
+        blob: normalize([title, excerpt, slugFromUrl(abs), abs].join(" "))
+      });
+    }
+    return out;
+  }
+
+  function collectBlogFromText(includeWidget){
+    const nodes = Array.from(document.querySelectorAll("p, li, div, span"))
+      .filter(el => includeWidget || !isInsideWidget(el))
+      .filter(el => {
+        const t = (el.textContent || "").trim();
+        return t.length >= 10 && t.length <= 12000;
+      });
+
+    const out = [];
+    const reFull = /https?:\/\/[^\s"'<>()[\]]+?(?:\/|^)blog\/[^\s"'<>()[\]]+/ig;
+    const reNoProto = /(?:[a-z0-9-]+\.)+[a-z]{2,}\/[^\s"'<>()[\]]*blog\/[^\s"'<>()[\]]+/ig;
+    const reAbs  = /(^|[\s(>])\/blog\/[a-z0-9\-_\/]+/ig;
+    const reRel  = /(^|[\s(>])blog\/[a-z0-9\-_\/]+/ig;
+
+    for(const el of nodes){
+      const text = el.textContent || "";
+      const matches = new Set();
+      let m;
+
+      while((m = reFull.exec(text))) matches.add(m[0]);
+      while((m = reNoProto.exec(text))) matches.add("https://" + m[0].replace(/^https?:\/\//i,""));
+      while((m = reAbs.exec(text))) matches.add(String(m[0]).trim().replace(/^[\s(>]+/,""));
+      while((m = reRel.exec(text))) matches.add(String(m[0]).trim().replace(/^[\s(>]+/,"/"));
+
+      if(!matches.size) continue;
+
+      for(const rawUrl of matches){
+        const abs = absolutize(rawUrl);
+        if(!isBlogPostUrl(abs)) continue;
+
+        const ctx = contextElFor(el);
+        const { title, excerpt } = inferTitleExcerptFromContext(abs, ctx);
+        const img = pickImgFromContext(ctx) || PLACEHOLDER_IMG;
+
+        out.push({
+          kind:"blog",
+          id:"blog:" + abs,
+          url: abs,
+          title,
+          excerpt: excerpt || "",
+          fullText: "",
+          isFullLoaded: false,
+          img,
+          blob: normalize([title, excerpt, slugFromUrl(abs), abs].join(" "))
+        });
+      }
+    }
+    return out;
+  }
+
+  function collectFaqFromSection(includeWidget){
+    const start = findFaqHeading(includeWidget);
+    if(!start) return [];
+    const section = start.closest("section, .page-section, .sqs-block, .content, .sqs-layout, .sqs-block-content") || start.parentElement || document.body;
+
+    const out = [];
+
+    // Prefer <details>
+    const details = Array.from(section.querySelectorAll("details")).filter(d => includeWidget || !isInsideWidget(d));
+    if(details.length){
+      details.forEach(d => {
+        const sum = d.querySelector("summary");
+        const q = sum ? (sum.textContent||"").trim() : "";
+        if(!q || q.length < 4) return;
+        const a = (d.textContent||"").replace(q,"").trim();
+        out.push({
+          kind:"faq",
+          id:"faq:" + hashId(q),
+          url:"",
+          title:q,
+          excerpt: clampStr(a, 180),
+          answer: a || "Antwort nicht gefunden.",
+          img: FAQ_IMG,
+          blob: normalize([q, a].join(" "))
+        });
+      });
+      return uniqBy(out, x => x.id);
+    }
+
+    // Fallback: h3/h4/strong questions
+    const all = Array.from(section.querySelectorAll("*")).filter(el => includeWidget || !isInsideWidget(el));
+    const startIdx = all.indexOf(start);
+    if(startIdx < 0) return [];
+    const after = all.slice(startIdx + 1);
+
+    const questionEls = after.filter(el => /^(h3|h4|strong)$/i.test(el.tagName) && (el.textContent||"").trim().length >= 6);
+    for(const qEl of questionEls.slice(0, 80)){
+      const q = (qEl.textContent||"").trim();
+      if(!q) continue;
+
+      let ansParts = [];
+      let cur = qEl.nextElementSibling;
+      let steps = 0;
+
+      while(cur && steps < 25){
+        steps++;
+        if(questionEls.includes(cur)) break;
+        const tag = (cur.tagName||"").toLowerCase();
+        if(["p","li","div"].includes(tag)){
+          const t = (cur.textContent||"").trim();
+          if(t && t.length >= 3) ansParts.push(t);
+        }
+        cur = cur.nextElementSibling;
+      }
+
+      const a = ansParts.join("\n").trim();
+      out.push({
+        kind:"faq",
+        id:"faq:" + hashId(q),
+        url:"",
+        title:q,
+        excerpt: clampStr(a || "Antwort anzeigen", 180),
+        answer: a || "Antwort nicht gefunden.",
+        img: FAQ_IMG,
+        blob: normalize([q, a].join(" "))
+      });
+    }
+    return uniqBy(out, x => x.id);
+  }
+
+  let items = [];
+  let blogItems = [];
+  let faqItems = [];
+
+  /* ---------- Fulltext fetch + cache ---------- */
+  function cacheKeyForUrl(url){ return LS_BLOGCACHE_PREFIX + hashId(url); }
+
+  function getCachedBlogText(url){
+    try{
+      const raw = localStorage.getItem(cacheKeyForUrl(url));
+      if(!raw) return "";
+      const obj = JSON.parse(raw);
+      if(!obj || !obj.text || !obj.ts) return "";
+      if((Date.now() - obj.ts) > BLOGCACHE_TTL_MS) return "";
+      return String(obj.text || "");
+    }catch(e){ return ""; }
+  }
+  function setCachedBlogText(url, text){
+    try{
+      localStorage.setItem(cacheKeyForUrl(url), JSON.stringify({ ts: Date.now(), text: String(text||"") }));
+    }catch(e){}
+  }
+
+  async function fetchBlogText(url){
+    try{
+      const r = await fetch(url, { method:"GET" });
+      if(!r.ok) return "";
+      const html = await r.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+
+      // Try main content areas
+      const main =
+        doc.querySelector("article") ||
+        doc.querySelector("main") ||
+        doc.querySelector(".blog-item") ||
+        doc.querySelector(".sqs-block-content") ||
+        doc.body;
+
+      // Collect paragraphs and lists
+      const parts = Array.from(main.querySelectorAll("h1,h2,h3,p,li"))
+        .map(x => (x.textContent||"").trim())
+        .filter(Boolean)
+        .filter(t => t.length >= 3)
+        .filter(t => !/weiterlesen/i.test(t));
+
+      const text = parts.join("\n").trim();
+      return text;
+    }catch(e){
+      return "";
+    }
+  }
+
+  async function fetchBlogIndex(){
+    try{
+      const url = absolutize("/blog/");
+      const r = await fetch(url, { method:"GET" });
+      if(!r.ok) return [];
+      const html = await r.text();
+      const doc = new DOMParser().parseFromString(html, "text/html");
+      const anchors = Array.from(doc.querySelectorAll("a[href]"));
+      const out = [];
+
+      anchors.forEach(a => {
+        const href = (a.getAttribute("href") || "").trim();
+        if(!href) return;
+        const abs = absolutize(href);
+        if(!isBlogPostUrl(abs)) return;
+        const title = (a.textContent || "").trim() || slugFromUrl(abs);
+        out.push({
+          kind:"blog",
+          id:"blog:" + abs,
+          url: abs,
+          title,
+          excerpt: "Artikel öffnen",
+          fullText: "",
+          isFullLoaded: false,
+          img: PLACEHOLDER_IMG,
+          blob: normalize([title, slugFromUrl(abs), abs].join(" "))
+        });
+      });
+
+      return uniqBy(out, x => x.id);
+    }catch(e){
+      return [];
+    }
+  }
+
+  let currentQuery = "";
+  let fetchQueue = [];
+  let fetching = 0;
+  const MAX_CONCURRENCY = 4;
+
+  function scheduleFullTextFetch(){
+    fetchQueue = blogItems.filter(b => !b.isFullLoaded).map(b => b.url);
+    pumpQueue();
+  }
+
+  function pumpQueue(){
+    while(fetching < MAX_CONCURRENCY && fetchQueue.length){
+      const url = fetchQueue.shift();
+      const it = blogItems.find(x => x.url === url);
+      if(!it || it.isFullLoaded) continue;
+
+      fetching++;
+      (async () => {
+        try{
+          const cached = getCachedBlogText(url);
+          const text = cached || await fetchBlogText(url);
+          if(text && !cached) setCachedBlogText(url, text);
+
+          it.fullText = text || "";
+          it.isFullLoaded = true;
+
+          // expand searchable blob significantly:
+          // add full text + slug + title/excerpt (already there)
+          const expanded = [it.title, it.excerpt, it.fullText, slugFromUrl(url), url].join(" ");
+          it.blob = normalize(expanded);
+
+          // update suggestions/results live if user typed something
+          if(currentQuery && currentQuery.trim().length >= 2){
+            updateSuggestionDropdown(currentQuery);
+            // if user has already searched, re-render list with stronger matches
+            if(searchedOnce){
+              renderSearchResults(currentQuery, { liveUpdate:true });
+            }
+          }
+        } finally {
+          fetching--;
+          pumpQueue();
+        }
+      })();
+    }
+  }
+
+  /* ---------- Popularity ---------- */
+  function loadPopularity(){
+    try{
+      const raw = localStorage.getItem(LS_POP);
+      const obj = raw ? JSON.parse(raw) : {};
+      return (obj && typeof obj === "object") ? obj : {};
+    }catch(e){ return {}; }
+  }
+  function savePopularity(obj){
+    try{ localStorage.setItem(LS_POP, JSON.stringify(obj)); }catch(e){}
+  }
+  function bumpPopularity(id){
+    const pop = loadPopularity();
+    pop[id] = (pop[id] || 0) + 1;
+    savePopularity(pop);
+    renderPopular();
+  }
+
+  function renderPopular(){
+    const pop = loadPopularity();
+    const ranked = items
+      .map(it => ({...it, p: pop[it.id] || 0}))
+      .sort((a,b) => b.p - a.p);
+
+    let picks = ranked.filter(x => x.p > 0).slice(0,4);
+    if(picks.length < 4){
+      const fill = ranked.filter(x => !picks.some(p => p.id === x.id)).slice(0, 4 - picks.length);
+      picks = picks.concat(fill);
+    }
+    picks = picks.slice(0,4);
+
+    els.popular.innerHTML = "";
+    if(!picks.length){
+      els.popular.innerHTML = `<div class="ecpt-muted">Noch keine Artikel gefunden.</div>`;
+      return;
+    }
+
+    picks.forEach(it => {
+      const card = document.createElement("div");
+      card.className = "ecpt-popcard";
+      const imgUrl = (it.kind === "faq") ? FAQ_IMG : (it.img || PLACEHOLDER_IMG);
+      card.innerHTML = `
+        <div class="ecpt-popimg" style="background-image:url('${escapeHtml(imgUrl)}');"></div>
+        <div class="ecpt-popbody">
+          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
+          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
+        </div>
+      `;
+      card.addEventListener("click", () => {
+        bumpPopularity(it.id);
+        if(it.kind === "blog") window.location.href = it.url;
+        else scrollToFaq(it.title);
+      });
+      els.popular.appendChild(card);
+    });
+  }
+
+  /* ==========================================================
+     Search scoring (title + excerpt + FULLTEXT blob)
+     ========================================================== */
+  function scoreItem(it, tokens){
+    const blob = it.blob || "";
+    let s = 0;
+
+    for(const tok of tokens){
+      if(blob.includes(tok)) s += 12;
+      // fuzzy-ish fallback: stem
+      if(tok.length >= 5){
+        const stem = tok.slice(0, tok.length - 1);
+        if(stem.length >= 4 && blob.includes(stem)) s += 4;
+      }
+    }
+
+    // boost if many tokens matched
+    const hitCount = tokens.filter(t => blob.includes(t)).length;
+    s += hitCount * 3;
+
+    // slight preference: blogs (because they contain full answers usually)
+    if(it.kind === "faq") s -= 1;
+
+    return s;
+  }
+
+  function findMatches(query){
+    const tokens = tokenize(query);
+    if(!tokens.length) return [];
+    const scored = items
+      .map(it => ({ ...it, score: scoreItem(it, tokens) }))
+      .filter(x => x.score > 0)
+      .sort((a,b) => b.score - a.score);
+
+    return uniqBy(scored, x => x.id);
+  }
+
+  /* ==========================================================
+     Dropdown suggestions (only dropdown; if none -> show "Nichts passendes gefunden?")
+     ========================================================== */
+  function hideSuggestions(){
+    els.suggestions.style.display = "none";
+    els.input.setAttribute("aria-expanded","false");
+  }
+
+  function showSuggestions(){
+    els.suggestions.style.display = "block";
+    els.input.setAttribute("aria-expanded","true");
+  }
+
+  function openHelpFromSuggestion(q){
+    els.help.style.display = "";
+    els.helpInput.value = q || "";
+    els.helpPanel.style.display = "";
+    // scroll a bit to results section for context
+    els.resultsMeta.scrollIntoView({ behavior:"smooth", block:"start" });
+  }
+
+  function updateSuggestionDropdown(query){
+    const q = (query||"").trim();
+    currentQuery = q;
+
+    if(q.length < 2){
+      els.suggestions.innerHTML = "";
+      hideSuggestions();
+      return;
+    }
+
+    const matches = findMatches(q);
+
+    els.suggestions.innerHTML = "";
+
+    if(!matches.length){
+      // (1) If absolutely no results: show "Nichts passendes gefunden?" as suggestion
+      const row = document.createElement("div");
+      row.className = "ecpt-suggestion";
+      row.setAttribute("role", "option");
+      row.innerHTML = `
+        <div class="ecpt-suggestion-title">
+          Nichts passendes gefunden? <span class="ecpt-badge">Vorschlag</span>
+        </div>
+        <div class="ecpt-suggestion-meta">Klicke hier, um deine Frage an Eleny zu stellen oder als offene Frage zu speichern.</div>
+      `;
+      row.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        hideSuggestions();
+        openHelpFromSuggestion(q);
+      });
+      els.suggestions.appendChild(row);
+      showSuggestions();
+      return;
+    }
+
+    matches.slice(0, 7).forEach(m => {
+      const row = document.createElement("div");
+      row.className = "ecpt-suggestion";
+      row.setAttribute("role", "option");
+      row.innerHTML = `
+        <div class="ecpt-suggestion-title">
+          ${escapeHtml(m.title)} <span class="ecpt-badge">${m.kind === "faq" ? "FAQ" : "Blog"}</span>
+        </div>
+        <div class="ecpt-suggestion-meta">${escapeHtml(m.kind === "faq" ? (m.excerpt || "Zu den FAQs springen") : clampStr(m.excerpt || "", 110))}</div>
+      `;
+      row.addEventListener("mousedown", (e) => {
+        e.preventDefault();
+        hideSuggestions();
+        bumpPopularity(m.id);
+        if(m.kind === "blog"){
+          window.location.href = m.url;
+        } else {
+          // (5) FAQ click scroll to FAQs section
+          scrollToFaq(m.title);
+        }
+      });
+      els.suggestions.appendChild(row);
+    });
+
+    showSuggestions();
+  }
+
+  /* ==========================================================
+     Search results rendering (Enter/Suchen): list of 3–4 two-liners
+     ========================================================== */
+  let searchedOnce = false;
+
+  function setHelpStateAfterSearch(q, hasResults){
+    // show help container only after a search was executed
+    if(!searchedOnce || !q) { els.help.style.display = "none"; return; }
+    els.help.style.display = "";
+    els.helpInput.value = q;
+
+    // If results exist: collapsed as button
+    els.helpPanel.style.display = hasResults ? "none" : "";
+  }
+
+  function renderSearchResults(query, opts){
+    const q = (query||"").trim();
+    if(!q){
+      els.resultsMeta.textContent = "Gib oben einen Begriff ein.";
+      els.resultsWrap.innerHTML = "";
+      els.help.style.display = "none";
+      return;
+    }
+
+    const matches = findMatches(q);
+
+    els.resultsWrap.innerHTML = "";
+
+    if(!matches.length){
+      els.resultsMeta.textContent = "Keine Treffer gefunden.";
+      setHelpStateAfterSearch(q, false);
+      return;
+    }
+
+    const list = matches.slice(0, 3);
+    els.resultsMeta.textContent = `${list.length} Treffer gefunden`;
+
+    list.forEach(m => {
+      const card = document.createElement("div");
+      card.className = "ecpt-line";
+      const line1 = m.kind === "faq" ? "FAQ – zum FAQ-Bereich springen" : m.title;
+      const line2 = m.kind === "faq" ? (m.excerpt || "Klicke, um direkt zu den FAQs zu springen.") : (m.excerpt || "Artikel öffnen");
+      card.innerHTML = `
+        <div class="t">${escapeHtml(line1)}</div>
+        <p class="d">${escapeHtml(clampStr(line2, 160))}</p>
+      `;
+      card.addEventListener("click", () => {
+        bumpPopularity(m.id);
+        if(m.kind === "blog") window.location.href = m.url;
+        else scrollToFaq(m.title);
+      });
+      els.resultsWrap.appendChild(card);
+    });
+
+    setHelpStateAfterSearch(q, true);
+
+    // on live update, avoid aggressive scroll jumps
+    if(!(opts && opts.liveUpdate)){
+      els.resultsMeta.scrollIntoView({ behavior:"smooth", block:"start" });
+    }
+  }
+
+  function runSearch(query){
+    const q = (query||"").trim();
+    searchedOnce = true;
+    hideSuggestions(); // (2) dropdown disappears after search
+    renderSearchResults(q);
+  }
+
+  /* ==========================================================
+     Help panel actions
+     ========================================================== */
+  els.helpToggle.addEventListener("click", () => {
+    const open = els.helpPanel.style.display !== "none";
+    els.helpPanel.style.display = open ? "none" : "";
+  });
+  els.helpAi.addEventListener("click", () => {
+    const q = (els.helpInput.value || "").trim();
+    if(!q) return;
+    setAiOpen(true);
+    els.chatInput.value = q;
+    sendChat(q);
+  });
+  els.helpNewQ.addEventListener("click", () => {
+    const q = (els.helpInput.value || "").trim();
+    openNewQuestionForm(q, "requireDetails");
+  });
+
+  /* ==========================================================
+     Open Questions (kept; local fallback)
+     ========================================================== */
+  const LS_OPENQ = "ecpt_openq_local_v2";
+
+  async function apiPost(path, payload){
+    const url = ECPT_API_BASE ? (ECPT_API_BASE.replace(/\/$/,"") + path) : "";
+    if(!url) return null;
+    const r = await fetch(url, { method:"POST", headers:{ "Content-Type":"application/json" }, body: JSON.stringify(payload) });
+    if(!r.ok) throw new Error("API POST failed");
+    try{ return await r.json(); }catch(e){ return { ok:true }; }
+  }
+
+  async function loadOpenQ(){
+    try{
+      const raw = localStorage.getItem(LS_OPENQ);
+      const arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    }catch(e){ return []; }
+  }
+  async function saveOpenQ(arr){
+    try{ localStorage.setItem(LS_OPENQ, JSON.stringify(arr)); }catch(e){}
+  }
+
+  let openQRequireExtra = false;
+  let openQInitialBody = "";
+
+  function openNewQuestionForm(prefillTitleText, mode){
+    showView("openq");
+    els.openQForm.style.display = "";
+
+    const t = (prefillTitleText || "").trim();
+    els.openQTitle.value = "Frage: " + genTitleFromText(t || "Allgemeine Anfrage");
+
+    if(mode === "requireDetails"){
+      openQRequireExtra = true;
+      openQInitialBody = (t || "").trim();
+      els.openQBody.value = openQInitialBody;
+      els.openQNote.textContent = "Bitte ergänze unten 1–2 Sätze Details/Beschreibung, dann abschicken.";
+    } else {
+      openQRequireExtra = false;
+      openQInitialBody = "";
+      els.openQBody.value = t ? ("Frage:\n" + t + "\n\nDetails:\n- ") : "";
+      els.openQNote.textContent = "Du kannst Titel und Text anpassen und dann abschicken oder löschen.";
+    }
+
+    setTimeout(() => els.openQBody.focus(), 60);
+  }
+
+  function clearNewQuestionForm(){
+    els.openQTitle.value = "";
+    els.openQBody.value = "";
+    els.openQNote.textContent = "";
+    els.openQForm.style.display = "none";
+    openQRequireExtra = false;
+    openQInitialBody = "";
+  }
+
+  async function renderOpenQ(){
+    const qs = await loadOpenQ();
+    els.openQList.innerHTML = "";
+    if(!qs.length){
+      els.openQList.innerHTML = `<div class="ecpt-muted">Noch keine offenen Fragen.</div>`;
+      return;
+    }
+    qs.slice().reverse().forEach(q => {
+      const status = q.status === "answered" ? "beantwortet" : "offen";
+      const statusClass = q.status === "answered" ? "ecpt-answered" : "";
+      const item = document.createElement("div");
+      item.className = "ecpt-openq-item";
+      item.innerHTML = `
+        <div class="t">${escapeHtml(q.title || "Ohne Titel")}</div>
+        <p class="b">${escapeHtml(q.body || "")}</p>
+        <div class="meta">
+          <span class="ecpt-status ${statusClass}">${escapeHtml(status)}</span>
+          <span class="ecpt-dt">${escapeHtml(prettyDate(q.createdAt || ""))}</span>
+        </div>
+      `;
+      els.openQList.appendChild(item);
+    });
+  }
+
+  async function submitNewQuestion(){
+    const title = (els.openQTitle.value || "").trim();
+    const body  = (els.openQBody.value || "").trim();
+
+    if(!title || !body){
+      els.openQNote.textContent = "Bitte Titel und Beschreibung ausfüllen.";
+      return;
+    }
+    if(openQRequireExtra){
+      if(body === (openQInitialBody || "").trim() || body.length < Math.max(12, (openQInitialBody||"").trim().length + 5)){
+        els.openQNote.textContent = "Bitte ergänze noch Details (damit wir es gut beantworten können).";
+        return;
+      }
+    }
+
+    // local save; if you use ECPT_API_BASE you can also send emails from your endpoint
+    const qs = await loadOpenQ();
+    qs.push({ id: Math.random().toString(16).slice(2), title, body, createdAt: nowISO(), status:"open" });
+    await saveOpenQ(qs);
+
+    // optional webhook
+    if(ECPT_API_BASE){
+      try{ await apiPost("/open-questions", { title, body, createdAt: nowISO(), pageUrl: window.location.href }); } catch(e){}
+    }
+
+    await renderOpenQ();
+    clearNewQuestionForm();
+  }
+
+  els.openQSubmit.addEventListener("click", submitNewQuestion);
+  els.openQDelete.addEventListener("click", clearNewQuestionForm);
+
+  /* ==========================================================
+     Chatbot (faster + "Mehr Informationen darüber" before answer)
+     ========================================================== */
+  let lastBotAskedMore = false;
+
+  function setAiOpen(open){
+    root.classList.toggle("ecpt-ai-open", !!open);
+    els.aiBtn.setAttribute("aria-pressed", open ? "true" : "false");
+    els.chat.setAttribute("aria-hidden", open ? "false" : "true");
+    if(open){
+      hideSuggestions();
+      if(!els.chatBody.dataset.inited){
+        els.chatBody.dataset.inited = "1";
+        botTypewriter("Hey 🙂 Ich bin Eleny. Was ist deine Frage?", []);
+      }
+      setTimeout(() => els.chatInput.focus(), 40);
+    }
+  }
+
+  function bubble(kind, nodeOrHtml){
+    const wrap = document.createElement("div");
+    wrap.className = "ecpt-bubble " + (kind === "me" ? "ecpt-me" : "ecpt-bot");
+    wrap.innerHTML = `
+      <div class="ecpt-avatar">${kind === "me" ? "DU" : "EL"}</div>
+      <div class="ecpt-msg"></div>
+    `;
+    const msg = wrap.querySelector(".ecpt-msg");
+    if(typeof nodeOrHtml === "string") msg.innerHTML = nodeOrHtml;
+    else msg.appendChild(nodeOrHtml);
+    els.chatBody.appendChild(wrap);
+    els.chatBody.scrollTop = els.chatBody.scrollHeight;
+    return wrap;
+  }
+
+  function meSay(text){ bubble("me", escapeHtml(text)); }
+
+  function typingBubble(){
+    const el = document.createElement("div");
+    el.className = "ecpt-typing";
+    el.innerHTML = `<span class="ecpt-dot"></span><span class="ecpt-dot"></span><span class="ecpt-dot"></span>`;
+    return bubble("bot", el);
+  }
+
+  function dedupeSentences(text){
+    const parts = String(text || "").split(/(?<=[.!?])\s+/);
+    const seen = new Set();
+    const out = [];
+    for(const part of parts){
+      const key = normalize(part);
+      if(!key || seen.has(key)) continue;
+      seen.add(key);
+      out.push(part);
+    }
+    return out.join(" ").replace(/\s+/g, " ").trim();
+  }
+
+  function botTypewriter(text, actions, opts){
+    const typingWrap = typingBubble();
+    setTimeout(() => {
+      const msg = typingWrap.querySelector(".ecpt-msg");
+      msg.innerHTML = "";
+      if(opts && Array.isArray(opts.prefixNodes)){
+        opts.prefixNodes.forEach(node => {
+          msg.appendChild(node);
+        });
+      }
+      const p = document.createElement("div");
+      p.style.whiteSpace = "pre-wrap";
+      msg.appendChild(p);
+
+      const cleaned = dedupeSentences(text);
+      const words = cleaned.split(/\s+/).filter(Boolean);
+      let i = 0;
+      const speed = 45; // faster word-by-word typing
+      const tick = () => {
+        i++;
+        p.textContent = words.slice(0, i).join(" ");
+        els.chatBody.scrollTop = els.chatBody.scrollHeight;
+        if(i < words.length) setTimeout(tick, speed);
+        else {
+          if(actions && actions.length){
+            const act = document.createElement("div");
+            act.className = "ecpt-chat-actions";
+            actions.forEach(a => act.appendChild(a));
+            msg.appendChild(act);
+          }
+          if(opts && Array.isArray(opts.appendNodes)){
+            opts.appendNodes.forEach(node => {
+              msg.appendChild(node);
+            });
+          }
+        }
+      };
+      tick();
+    }, 220); // (3) shorter "thinking" delay
+  }
+
+  function mkBtn(label, kind, small){
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "ecpt-btn " + (kind === "accent" ? "ecpt-btn-accent" : "ecpt-btn-outline") + (small ? " ecpt-btn-small" : "");
+    b.textContent = label;
+    return b;
+  }
+
+  function looksLikeNo(msg){
+    const t = normalize(msg).trim();
+    const no = ["nein","no","nö","noe","nee","ne","passt","danke","danke nein","nein danke","alles gut","das wars","das war's"];
+    return no.some(x => t === x || t.startsWith(x + " "));
+  }
+
+  function looksLikeContactRequest(msg){
+    const t = normalize(msg);
+    return [
+      "kontakt",
+      "kontaktangaben",
+      "email",
+      "e-mail",
+      "mailadresse",
+      "telefon",
+      "handynummer",
+      "nummer",
+      "rueckruf",
+      "rückruf",
+      "anrufen",
+      "erreichen",
+      "kontaktdaten"
+    ].some(k => t.includes(k));
+  }
+
+  function openContactRequestForm({ name, email, topic }){
+    showView("openq");
+    els.openQForm.style.display = "";
+    const safeName = name || "Gast";
+    els.openQTitle.value = `Kontaktanfrage: ${safeName}`;
+    els.openQBody.value = `Name: ${name || ""}\nE-Mail: ${email || ""}\n\nAnliegen:\n${topic || ""}`.trim();
+    els.openQNote.textContent = "Bitte prüfen und abschicken. Wir melden uns zeitnah.";
+    setTimeout(() => els.openQBody.focus(), 60);
+  }
+
+  async function submitOpenQuestionFromChat({ name, email, topic, isPrivate }){
+    if(ECPT_API_BASE){
+      try{
+        await apiPost("/open-questions", {
+          title: `Frage von ${name || "Gast"}`,
+          body: topic,
+          createdAt: nowISO(),
+          pageUrl: window.location.href,
+          email,
+          isPrivate
+        });
+      }catch(e){}
+    }
+
+    if(isPrivate){
+      return;
+    }
+
+    const qs = await loadOpenQ();
+    qs.push({
+      id: Math.random().toString(16).slice(2),
+      title: `Frage von ${name || "Gast"}`,
+      body: `Kontakt: ${name || ""} (${email || ""})\n\n${topic}`,
+      createdAt: nowISO(),
+      status:"open"
+    });
+    await saveOpenQ(qs);
+    await renderOpenQ();
+  }
+
+  function createContactForm(prefillTopic){
+    const form = document.createElement("div");
+    form.className = "ecpt-chat-form";
+    form.innerHTML = `
+      <input class="ecpt-input" type="text" placeholder="Dein Name" aria-label="Name" />
+      <input class="ecpt-input" type="email" placeholder="Deine E-Mail" aria-label="E-Mail" />
+      <textarea class="ecpt-input" rows="3" placeholder="Worum geht es?" aria-label="Anliegen"></textarea>
+      <button class="ecpt-btn ecpt-btn-accent" type="button">Anfrage senden</button>
+    `;
+    const [nameInput, emailInput, topicInput] = form.querySelectorAll(".ecpt-input");
+    if(prefillTopic) topicInput.value = prefillTopic;
+    const submitBtn = form.querySelector("button");
+    submitBtn.addEventListener("click", () => {
+      const name = (nameInput.value || "").trim();
+      const email = (emailInput.value || "").trim();
+      const topic = (topicInput.value || "").trim();
+      if(!name || !email || !topic){
+        submitBtn.textContent = "Bitte alle Felder ausfüllen";
+        return;
+      }
+      openContactRequestForm({ name, email, topic });
+    });
+    return form;
+  }
+
+  function createQuestionForm(prefillTopic){
+    const form = document.createElement("div");
+    form.className = "ecpt-chat-form";
+    form.innerHTML = `
+      <input class="ecpt-input" type="text" placeholder="Dein Name" aria-label="Name" />
+      <input class="ecpt-input" type="email" placeholder="Deine E-Mail" aria-label="E-Mail" />
+      <textarea class="ecpt-input" rows="4" placeholder="Worum geht es?" aria-label="Anliegen"></textarea>
+      <label class="ecpt-muted ecpt-small" style="display:flex; align-items:center; gap:8px;">
+        <input type="checkbox" class="ecpt-input" style="width:auto;" /> Privat stellen
+      </label>
+      <button class="ecpt-btn ecpt-btn-accent" type="button">Frage senden</button>
+    `;
+    const [nameInput, emailInput, topicInput] = form.querySelectorAll(".ecpt-input");
+    const privateToggle = form.querySelector("input[type='checkbox']");
+    if(prefillTopic) topicInput.value = prefillTopic;
+    const submitBtn = form.querySelector("button");
+    submitBtn.addEventListener("click", async () => {
+      const name = (nameInput.value || "").trim();
+      const email = (emailInput.value || "").trim();
+      const topic = (topicInput.value || "").trim();
+      if(!name || !email || !topic){
+        submitBtn.textContent = "Bitte alle Felder ausfüllen";
+        return;
+      }
+      submitBtn.textContent = "Gesendet ✓";
+      await submitOpenQuestionFromChat({ name, email, topic, isPrivate: !!privateToggle.checked });
+      if(privateToggle.checked){
+        botTypewriter("Danke! Wir melden uns zeitnah bei dir.", []);
+      } else {
+        botTypewriter("Danke! Deine Frage wurde an uns gesendet und erscheint bei den offenen Fragen.", []);
+      }
+    });
+    return form;
+  }
+
+  function createResolutionActions(question){
+    const wrap = document.createElement("div");
+    wrap.className = "ecpt-chat-actions";
+    const okBtn = mkBtn("Frage geklärt", "accent", true);
+    const openBtn = mkBtn("Frage noch offen", "outline", true);
+    okBtn.addEventListener("click", () => {
+      botTypewriter("Super! Danke dir 🙂 Wenn später noch etwas ist, bin ich da.", []);
+    });
+    openBtn.addEventListener("click", () => {
+      const followUpBtn = mkBtn("Neue Frage stellen", "accent", true);
+      followUpBtn.addEventListener("click", () => {
+        const form = createQuestionForm(question);
+        botTypewriter("Schick uns dein Anliegen, wir kümmern uns darum.", [], { appendNodes: [form] });
+      });
+      botTypewriter(
+        "Möchtest du dein Anliegen noch etwas genauer erklären oder die Frage direkt an uns schicken?",
+        [followUpBtn]
+      );
+    });
+    wrap.appendChild(okBtn);
+    wrap.appendChild(openBtn);
+    return wrap;
+  }
+
+  async function botAnswer(query){
+    const q = (query||"").trim();
+    if(!q){
+      botTypewriter("Magst du kurz sagen, worum es geht? 🙂", []);
+      return;
+    }
+
+    if(looksLikeContactRequest(q)){
+      const form = createContactForm(q);
+      botTypewriter(
+        "Gerne! Hinterlasse uns kurz deine Kontaktdaten und dein Anliegen, dann melden wir uns zeitnah.",
+        [],
+        { appendNodes: [form] }
+      );
+      return;
+    }
+
+    const matches = findMatches(q);
+    const best = matches[0] || null;
+
+    if(best){
+      bumpPopularity(best.id);
+
+      if(best.kind === "faq"){
+        // (4) button before answer (same message)
+        const btn = mkBtn("Mehr Informationen darüber", "outline", true);
+        btn.onclick = () => scrollToFaq(best.title);
+        lastBotAskedMore = true;
+        botTypewriter(
+          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKonnte ich dein Anliegen klären?",
+          [],
+          { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
+        );
+        return;
+      }
+
+      // blog: fetch full text and respond
+      const btn = mkBtn("Mehr Informationen darüber", "outline", true);
+      btn.onclick = () => window.location.href = best.url;
+
+      const full = await (async () => {
+        const cached = getCachedBlogText(best.url);
+        if(cached) return cached;
+        const t = await fetchBlogText(best.url);
+        if(t) setCachedBlogText(best.url, t);
+        return t || "";
+      })();
+
+      const tokens = tokenize(q);
+      const paras = String(full||"").split(/\n{1,}/).map(p => p.trim()).filter(p => p.length >= 25);
+      const scored = paras.map(p => {
+        const np = normalize(p);
+        let s = 0;
+        for(const tok of tokens){
+          if(np.includes(tok)) s += 2;
+          if(tok.length >= 5){
+            const stem = tok.slice(0, tok.length-1);
+            if(stem.length >= 4 && np.includes(stem)) s += 1;
+          }
+        }
+        return { p, s };
+      }).sort((a,b) => b.s - a.s);
+
+      const excerpt = uniqStrings(scored.filter(x => x.s > 0).slice(0, 6).map(x => x.p)).join("\n\n").trim()
+        || uniqStrings(paras.slice(0, 4)).join("\n\n").trim()
+        || "Ich habe einen passenden Artikel gefunden, kann den Inhalt aber gerade nicht sauber auslesen. Möchtest du den Artikel öffnen?";
+
+      lastBotAskedMore = true;
+      botTypewriter(
+        excerpt + "\n\nKonnte ich dein Anliegen klären?",
+        [],
+        { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
+      );
+      return;
+    }
+
+    lastBotAskedMore = true;
+    botTypewriter(
+      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
+      [],
+      { appendNodes: [createQuestionForm(q)] }
+    );
+  }
+
+  function sendChat(text){
+    const q = (text || els.chatInput.value || "").trim();
+    if(!q) return;
+
+    meSay(q);
+    els.chatInput.value = "";
+
+    if(lastBotAskedMore && looksLikeNo(q)){
+      lastBotAskedMore = false;
+      botTypewriter("Alles klar 🙂 Danke dir! Wenn du später noch etwas brauchst, bin ich da. 👋", []);
+      return;
+    }
+
+    botAnswer(q);
+  }
+
+  /* ==========================================================
+     Events
+     ========================================================== */
+  els.input.addEventListener("input", () => {
+    if(root.classList.contains("ecpt-ai-open")) return;
+    updateSuggestionDropdown(els.input.value || "");
+  });
+
+  els.input.addEventListener("keydown", (e) => {
+    if(e.key === "Enter"){
+      e.preventDefault();
+      runSearch(els.input.value || "");
+    } else if(e.key === "Escape"){
+      hideSuggestions();
+    }
+  });
+
+  els.searchBtn.addEventListener("click", () => runSearch(els.input.value || ""));
+
+  document.addEventListener("click", (e) => {
+    const inside = e.target.closest("#ecpt .ecpt-search-wrap");
+    if(!inside) hideSuggestions();
+  });
+
+  els.aiBtn.addEventListener("click", () => {
+    const willOpen = !root.classList.contains("ecpt-ai-open");
+    setAiOpen(willOpen);
+    if(willOpen){
+      const q = (els.input.value || "").trim();
+      if(q){
+        els.chatInput.value = q;
+        sendChat(q);
+      }
+    }
+  });
+  els.chatClose.addEventListener("click", () => setAiOpen(false));
+  els.chatSend.addEventListener("click", () => sendChat());
+  els.chatInput.addEventListener("keydown", (e) => {
+    if(e.key === "Enter" && !e.shiftKey){
+      e.preventDefault();
+      sendChat();
+    }
+  });
+
+  els.openQTopBtn.addEventListener("click", async () => {
+    showView("openq");
+    els.openQForm.style.display = "none";
+    els.openQNote.textContent = "";
+    await renderOpenQ();
+  });
+  els.backToSearch.addEventListener("click", () => {
+    showView("search");
+    els.openQForm.style.display = "none";
+    els.openQNote.textContent = "";
+  });
+  els.openQCreateBtn.addEventListener("click", () => openNewQuestionForm((els.input.value||"").trim(), "auto"));
+
+  /* ==========================================================
+     Build index + start fulltext fetching
+     ========================================================== */
+  function rebuildIndex(){
+    blogItems = uniqBy([...collectBlogFromAnchors(false), ...collectBlogFromText(false)], x => x.id);
+    faqItems = collectFaqFromSection(false);
+    items = uniqBy([...blogItems, ...faqItems], x => x.id);
+
+    if(!items.length){
+      blogItems = uniqBy([...collectBlogFromAnchors(true), ...collectBlogFromText(true)], x => x.id);
+      faqItems = collectFaqFromSection(true);
+      items = uniqBy([...blogItems, ...faqItems], x => x.id);
+    }
+
+    // preload cached blog texts into blob so search works immediately
+    blogItems.forEach(b => {
+      const cached = getCachedBlogText(b.url);
+      if(cached){
+        b.fullText = cached;
+        b.isFullLoaded = true;
+        b.blob = normalize([b.title, b.excerpt, b.fullText, slugFromUrl(b.url), b.url].join(" "));
+      }
+    });
+
+    renderPopular();
+
+    // start background fulltext fetch for remaining
+    scheduleFullTextFetch();
+
+    // keep dropdown synced if user already typed
+    if(currentQuery && currentQuery.length >= 2) updateSuggestionDropdown(currentQuery);
+
+    if(!items.length){
+      fetchBlogIndex().then(remoteBlogs => {
+        if(!remoteBlogs.length) return;
+        blogItems = uniqBy([...blogItems, ...remoteBlogs], x => x.id);
+        items = uniqBy([...blogItems, ...faqItems], x => x.id);
+        renderPopular();
+        scheduleFullTextFetch();
+        if(currentQuery && currentQuery.length >= 2) updateSuggestionDropdown(currentQuery);
+      });
+    }
+  }
+
+  /* Squarespace late content observer */
+  const mo = new MutationObserver(() => {
+    clearTimeout(rebuildIndex._t);
+    rebuildIndex._t = setTimeout(rebuildIndex, 250);
+  });
+  mo.observe(document.body, { childList:true, subtree:true });
+
+  /* init */
+  (async function init(){
+    rebuildIndex();
+    await renderOpenQ();
+    showView("search");
+    els.resultsMeta.textContent = "Gib oben einen Begriff ein.";
+    els.resultsWrap.innerHTML = "";
+    els.help.style.display = "none";
+  })();
+
+})();
+</script>
+</body>
+</html>
