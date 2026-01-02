@@ -360,7 +360,7 @@
       font-size:.8rem;
     }
     .article-card h2{
-      margin:0 0 14px;
+      margin:0;
       font-size:2rem;
     }
     .article-card p{
@@ -372,6 +372,25 @@
       margin:0 0 8px;
       font-size:1.2rem;
       color:var(--accent-dark);
+    }
+    .article-header{
+      display:flex;
+      align-items:flex-start;
+      justify-content:space-between;
+      gap:16px;
+      margin-bottom:14px;
+    }
+    .like-counter{
+      display:inline-flex;
+      align-items:center;
+      gap:6px;
+      font-weight:700;
+      color:var(--accent-dark);
+      background:var(--accent-soft-2);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:.85rem;
+      white-space:nowrap;
     }
     .source-bar{
       margin:18px 0 10px;
@@ -919,8 +938,10 @@
 
     const scrollToElement = (element) => {
       if (!element) return;
+      const offset = 80;
       requestAnimationFrame(() => {
-        element.scrollIntoView({ behavior: "smooth", block: "start" });
+        const top = element.getBoundingClientRect().top + window.scrollY - offset;
+        window.scrollTo({ top, behavior: "smooth" });
       });
     };
 
@@ -989,6 +1010,9 @@
     };
 
     const renderArticle = (category, topic, article) => {
+      if (article.likes === undefined) {
+        article.likes = 0;
+      }
       const sourceLinks = article.sources.map((source, index) => `
         <a class="source-pill" href="#source-${index}">${source}</a>
       `).join("");
@@ -1015,14 +1039,17 @@
 
       articleContent.innerHTML = `
         <div class="breadcrumb">
-          <span>Help Center</span>
+          <button class="link-btn breadcrumb-link" data-action="home" type="button">Help Center</button>
           <span>•</span>
-          <span>${category.title}</span>
+          <button class="link-btn breadcrumb-link" data-action="category" type="button">${category.title}</button>
           <span>•</span>
-          <span>${topic.title}</span>
+          <button class="link-btn breadcrumb-link" data-action="topic" type="button">${topic.title}</button>
           <span class="pill">Kategorie: ${category.title}</span>
         </div>
-        <h2>${article.question}</h2>
+        <div class="article-header">
+          <h2>${article.question}</h2>
+          <div class="like-counter" id="likeCounter">💜 ${article.likes}</div>
+        </div>
         <p>${topic.description}</p>
         <div class="source-bar">
           <span>Quellen:</span>
@@ -1039,12 +1066,12 @@
         <div class="feedback" id="feedback">
           <h4>War der Artikel hilfreich?</h4>
           <div class="feedback-actions">
-            <button class="btn btn-primary" data-feedback="yes" type="button">Ja, danke!</button>
+            <button class="btn btn-primary" data-feedback="yes" type="button">Ja klar</button>
             <button class="btn btn-outline" data-feedback="no" type="button">Nicht wirklich</button>
           </div>
           <div class="feedback-quick" id="feedbackQuick" style="display:none;">
             <input type="text" placeholder="Optional: kurzer Kommentar" />
-            <button class="btn btn-primary" type="button">Kommentar senden</button>
+            <button class="btn btn-primary" type="button">Feedback senden</button>
           </div>
           <div class="feedback-thanks" id="feedbackThanks" style="display:none;">Danke! Dein Feedback hilft uns, die Inhalte weiter zu verbessern.</div>
           <form class="feedback-form" id="feedbackForm" style="display:none;">
@@ -1071,14 +1098,48 @@
       const feedbackForm = articleContent.querySelector("#feedbackForm");
       const feedbackThanks = articleContent.querySelector("#feedbackThanks");
       const feedbackQuick = articleContent.querySelector("#feedbackQuick");
+      const feedbackActions = articleContent.querySelector(".feedback-actions");
+      const likeCounter = articleContent.querySelector("#likeCounter");
+      articleContent.querySelectorAll(".breadcrumb-link").forEach(link => {
+        link.addEventListener("click", () => {
+          const action = link.dataset.action;
+          if (action === "home") {
+            showView("home");
+            scrollToElement(categoryGrid);
+            return;
+          }
+          renderCategory(category);
+        });
+      });
+
+      articleContent.querySelectorAll(".source-pill").forEach(pill => {
+        pill.addEventListener("click", (event) => {
+          event.preventDefault();
+          const target = articleContent.querySelector(pill.getAttribute("href"));
+          scrollToElement(target);
+        });
+      });
+
+      articleNav.querySelectorAll("a").forEach(link => {
+        link.addEventListener("click", (event) => {
+          event.preventDefault();
+          const target = articleContent.querySelector(link.getAttribute("href"));
+          scrollToElement(target);
+        });
+      });
+
       feedbackButtons.forEach(button => {
         button.addEventListener("click", () => {
           const value = button.dataset.feedback;
           if (value === "yes") {
+            article.likes += 1;
+            likeCounter.textContent = `💜 ${article.likes}`;
+            feedbackActions.style.display = "none";
             feedbackQuick.style.display = "grid";
             feedbackThanks.style.display = "none";
             feedbackForm.style.display = "none";
           } else {
+            feedbackActions.style.display = "none";
             feedbackQuick.style.display = "none";
             feedbackThanks.style.display = "none";
             feedbackForm.style.display = "grid";
@@ -1092,13 +1153,17 @@
 
     const buildSearchIndex = () => {
       searchIndex = helpData.flatMap(category => category.topics.flatMap(topic => topic.articles.map(article => {
-        const keywordText = (topic.keywords || []).join(" ");
-        const articleKeywords = (article.keywords || []).join(" ");
-        const extrasText = (article.extras || []).join(" ");
+        const keywordText = (topic.keywords || []).join(" ").toLowerCase();
+        const articleKeywords = (article.keywords || []).join(" ").toLowerCase();
+        const extrasText = (article.extras || []).join(" ").toLowerCase();
         return {
           category,
           topic,
           article,
+          question: article.question.toLowerCase(),
+          topicTitle: topic.title.toLowerCase(),
+          keywordText,
+          bodyText: `${article.answer} ${extrasText}`.toLowerCase(),
           content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${articleKeywords} ${article.question} ${article.answer} ${extrasText}`.toLowerCase(),
           snippet: article.answer
         };
@@ -1108,11 +1173,26 @@
     const matchResults = (query) => {
       const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
       if (!terms.length) return [];
-      return searchIndex.filter(item => terms.every(term => item.content.includes(term)));
+      return searchIndex
+        .map(item => {
+          const score = terms.reduce((total, term) => {
+            if (!item.content.includes(term)) {
+              return total;
+            }
+            const inQuestion = item.question.includes(term) ? 3 : 0;
+            const inTopic = item.topicTitle.includes(term) ? 2 : 0;
+            const inKeywords = item.keywordText.includes(term) ? 2 : 0;
+            const inBody = item.bodyText.includes(term) ? 1 : 0;
+            return total + inQuestion + inTopic + inKeywords + inBody;
+          }, 0);
+          return { ...item, score };
+        })
+        .filter(item => item.score > 0)
+        .sort((a, b) => b.score - a.score);
     };
 
     const renderSuggestions = (query) => {
-      const results = matchResults(query).slice(0, 5);
+      const results = matchResults(query).slice(0, 4);
       if (!results.length) {
         searchSuggestions.classList.remove("active");
         searchSuggestions.innerHTML = "";
