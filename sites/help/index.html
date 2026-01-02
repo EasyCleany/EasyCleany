@@ -1164,6 +1164,8 @@
         answerHtml: formatMarkdownHtml(body),
         fullText: cleanBody,
         summary,
+        answer: summary || "Dieser Beitrag wird demnächst ergänzt.",
+        fullText: cleanBody,
         keywords: Array.isArray(data.keywords) ? data.keywords : [],
         extras: [],
         sources: ["EasyCleany Blog"]
@@ -1467,6 +1469,7 @@
           bodyText: `${article.answer} ${fullText} ${extrasText}`.toLowerCase(),
           content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${articleKeywords} ${article.question} ${article.answer} ${fullText} ${extrasText}`.toLowerCase(),
           snippet: snippetText || buildSummary(article.fullText || "")
+          snippet: article.answer || buildSummary(article.fullText || "")
         };
       })));
     };
