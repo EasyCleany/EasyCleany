@@ -150,6 +150,14 @@
       background:var(--card);
       border-radius:20px;
       padding:28px 24px;
+      grid-template-columns:repeat(auto-fit, minmax(220px, 1fr));
+      gap:18px;
+      margin-top:-60px;
+    }
+    .category-card{
+      background:var(--card);
+      border-radius:20px;
+      padding:20px;
       box-shadow:var(--shadow);
       border:1px solid var(--line);
       display:flex;
@@ -157,6 +165,7 @@
       align-items:center;
       text-align:center;
       gap:14px;
+      gap:12px;
       cursor:pointer;
       transition:transform .15s ease, border-color .15s ease;
     }
@@ -171,6 +180,15 @@
     .category-card h3{
       margin:0;
       font-size:1.2rem;
+      width:54px; height:54px;
+      display:grid; place-items:center;
+      border-radius:16px;
+      background:var(--accent-soft);
+      font-size:1.7rem;
+    }
+    .category-card h3{
+      margin:0;
+      font-size:1.1rem;
       font-weight:800;
     }
     .category-card p{
@@ -242,6 +260,7 @@
     .subcat-grid{
       display:grid;
       grid-template-columns:1fr;
+      grid-template-columns:repeat(auto-fit, minmax(240px, 1fr));
       gap:16px;
     }
     .subcat-card{
@@ -257,6 +276,10 @@
       transition:transform .15s ease, border-color .15s ease;
     }
     .subcat-card:hover{border-color:var(--line);}
+      cursor:pointer;
+      transition:transform .15s ease, border-color .15s ease;
+    }
+    .subcat-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
     .subcat-icon{
       width:48px; height:48px;
       border-radius:14px;
@@ -278,6 +301,10 @@
       gap:8px;
     }
     .subcat-list li{margin:0;}
+      columns:2;
+      column-gap:28px;
+    }
+    .subcat-list li{break-inside:avoid; margin-bottom:8px;}
     .subcat-link{
       color:var(--accent-dark);
       font-weight:600;
@@ -321,6 +348,8 @@
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
+    .subcat-card h3{margin:0; font-size:1.05rem;}
+    .subcat-card p{margin:0; color:var(--muted); font-size:.92rem;}
 
     .article-layout{
       display:grid;
@@ -361,6 +390,7 @@
     }
     .article-card h2{
       margin:0;
+      margin:0 0 14px;
       font-size:2rem;
     }
     .article-card p{
@@ -464,6 +494,7 @@
 
     .feedback-form,
     .feedback-quick{
+    .feedback-form{
       margin-top:16px;
       display:grid;
       gap:12px;
@@ -471,6 +502,9 @@
     .feedback-form textarea,
     .feedback-quick input{
       width:100%;
+    .feedback-form textarea{
+      width:100%;
+      min-height:120px;
       border-radius:12px;
       border:1px solid var(--line);
       padding:12px;
@@ -519,6 +553,8 @@
           <button class="search-btn" id="searchBtn" type="button">Suche</button>
         </div>
         <div class="search-suggestions" id="searchSuggestions" aria-live="polite"></div>
+          <input type="search" placeholder="Thema suchen (z.B. Abnahmeprotokoll, Kaution, Besenrein)" />
+        </div>
       </div>
     </section>
 
@@ -531,6 +567,7 @@
         <div class="search-results-head">
           <div>
             <h2 id="searchResultsTitle">Suchergebnisse</h2>
+            <h2>Suchergebnisse</h2>
             <div class="search-results-meta" id="searchResultsMeta">Gib oben einen Begriff ein.</div>
           </div>
         </div>
@@ -603,6 +640,25 @@
                 answer: "Bei einer umfassenden Renovation genügt es normalerweise, die Wohnung besenrein zu hinterlassen. Alles, was durch die Renovationsarbeiten ohnehin wieder schmutzig wird, muss nicht im Detail gereinigt werden. Die Baureinigung nach den Arbeiten ist Sache des Vermieters.",
                 extras: ["Lass dir eine geplante Renovation möglichst schriftlich bestätigen.", "Für Küche und Bad kann trotzdem eine Basisreinigung sinnvoll sein, um Diskussionen zu vermeiden."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Wie sauber muss die Wohnung bei der Übergabe sein?",
+              "Was bedeutet besenrein wirklich?",
+              "Reicht besenrein bei der Wohnungsabgabe aus?",
+              "Muss ich bei Renovation trotzdem gründlich putzen?",
+              "Welche Räume müssen besonders sauber sein?"
+            ],
+            sections: [
+              {
+                title: "Wie sauber muss die Wohnung bei der Übergabe sein?",
+                text: "In der Regel muss eine Mietwohnung gründlich gereinigt übergeben werden – also tipptopp sauber in allen Räumen. Dazu gehören Böden (fegen, staubsaugen, feucht aufnehmen), Fenster (innen und aussen), Küche (alle Geräte, Oberflächen, Spüle, Dampfabzug), Bad/WC (Sanitäreinrichtungen gründlich putzen) sowie Schränke, Keller oder Balkon. Kurz: so sauber, wie man sie selbst als neue Mieterin übernehmen möchte."
+              },
+              {
+                title: "Was bedeutet „besenrein“ und reicht das bei der Wohnungsabgabe?",
+                text: "„Besenrein“ bedeutet nur grob gereinigt (besensauber, gefegt und oberflächlich sauber). Das genügt nur, wenn es im Mietvertrag ausdrücklich vereinbart ist – oft gegen eine Reinigungspauschale. Selbst dann müssen Bad und Küche gründlich gereinigt werden, da diese Bereiche nicht unter eine blosse Kehrrreinigung fallen."
+              },
+              {
+                title: "Die Wohnung wird nach meinem Auszug renoviert – muss ich sie trotzdem putzen?",
+                text: "Bei einer umfassenden Renovation genügt es normalerweise, die Wohnung besenrein zu hinterlassen. Alles, was durch die Renovationsarbeiten ohnehin wieder schmutzig wird, muss nicht im Detail gereinigt werden. Eine zusätzliche Baureinigung nach den Arbeiten ist Sache des Vermieters."
               }
             ]
           },
@@ -626,6 +682,20 @@
                 answer: "Nein. Mieterinnen und Mieter müssen zwar gründlich reinigen, aber keine gefährlichen Arbeiten ausführen. Aussen liegende Fensterläden auszuhängen, an der Fassade zu klettern oder alte Doppelfenster zu zerlegen, kann nicht verlangt werden. Arbeiten mit Sicherheitsrisiko oder Fachkenntnis bleiben Aufgabe von Fachpersonen.",
                 extras: ["Bei Unsicherheit hilft ein kurzer Hinweis an die Vermietung, dass die Arbeit risikobehaftet ist.", "Dokumentiere, welche Arbeiten du aus Sicherheitsgründen nicht durchgeführt hast."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Muss ich Teppiche shampoonieren?",
+              "Was gilt bei stark verschmutzten Teppichen?",
+              "Muss ich aussenliegende Fensterläden reinigen?",
+              "Welche Reinigungsarbeiten sind zu gefährlich?"
+            ],
+            sections: [
+              {
+                title: "Muss ich Teppichböden reinigen oder shampoonieren?",
+                text: "Ja, fest verlegte Teppichböden sollten im Rahmen der Endreinigung gründlich gereinigt werden – oft inklusive Shampoonieren, um Flecken oder tiefsitzenden Schmutz zu entfernen. Eine Ausnahme gilt, wenn der Vermieter den alten Teppich ohnehin unmittelbar nach dem Auszug ersetzt."
+              },
+              {
+                title: "Muss ich gefährliche oder spezielle Reinigungsarbeiten durchführen?",
+                text: "Nein. Mieterinnen und Mieter müssen zwar gründlich reinigen, aber keine gefährlichen Arbeiten ausführen. Aussen liegende Fensterläden auszuhängen, an der Fassade zu klettern oder alte Doppelfenster zu zerlegen, kann nicht verlangt werden. Arbeiten mit Sicherheitsrisiko oder Fachkenntnis bleiben Aufgabe von Fachpersonen."
               }
             ]
           },
@@ -649,6 +719,20 @@
                 answer: "Die Vermieterseite muss Ihnen zuerst eine kurze Nachfrist zum Nachreinigen geben. Erst wenn die Wohnung danach immer noch nicht sauber ist, darf die Vermietung eine Reinigung organisieren und Ihnen die Kosten in Rechnung stellen.",
                 extras: ["Reagiere schnell auf Beanstandungen und protokolliere, was nachgereinigt wurde.", "So lassen sich zusätzliche Kosten meist vermeiden."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Muss ich eine Reinigungsfirma beauftragen?",
+              "Lohnt sich eine Abnahmegarantie?",
+              "Was passiert bei ungenügender Reinigung?",
+              "Wie läuft eine Nachreinigung ab?"
+            ],
+            sections: [
+              {
+                title: "Muss ich eine professionelle Reinigungsfirma für die Endreinigung engagieren?",
+                text: "Nein, es besteht keine Pflicht. Sie dürfen die Endreinigung selbst durchführen. Wichtig ist nur, dass die Wohnung am Ende sauber übergeben wird. Eine Firma mit Abnahmegarantie kann jedoch Stress vermeiden und Nachreinigungen abdecken."
+              },
+              {
+                title: "Was passiert, wenn die Wohnung bei der Abgabe nicht sauber genug ist?",
+                text: "Die Vermieterseite muss Ihnen zuerst eine kurze Nachfrist zum Nachreinigen geben. Erst wenn die Wohnung danach immer noch nicht sauber ist, darf die Vermietung eine Reinigung organisieren und Ihnen die Kosten in Rechnung stellen."
               }
             ]
           }
@@ -688,6 +772,24 @@
                 answer: "Ja, Sie können früher ausziehen und die Schlüssel abgeben. Schlagen Sie der Vermietung schriftlich einen früheren Termin vor. Wird der frühere Termin abgelehnt, können Sie die Schlüssel trotzdem per Einschreiben senden. Die Mietzahlungspflicht läuft bis Vertragsende weiter, eine Nutzungspflicht gibt es jedoch nicht.",
                 extras: ["Biete einen konkreten Termin mit Zeitfenster an, um die Planung zu erleichtern.", "Dokumentiere den Zustand der Wohnung auch bei vorzeitiger Abgabe."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Bis wann muss ich die Wohnung übergeben?",
+              "Was gilt bei Monatsende oder Feiertagen?",
+              "Was passiert, wenn niemand zur Abnahme kommt?",
+              "Kann ich früher ausziehen und die Schlüssel abgeben?"
+            ],
+            sections: [
+              {
+                title: "Bis wann muss ich am Auszugstermin die Wohnung übergeben?",
+                text: "Die Wohnung ist spätestens am letzten Tag der Mietdauer während der üblichen Geschäftszeiten zurückzugeben. Viele Mietverträge erlauben die Abgabe bis Mittag des folgenden Tages, wenn das Mietende auf einen Monatsletzten fällt. Fällt der Termin auf ein Wochenende oder einen Feiertag, verschiebt er sich auf den nächsten Werktag."
+              },
+              {
+                title: "Was, wenn der Vermieter die Wohnungsabnahme verweigert oder nicht erscheint?",
+                text: "Ihre Pflicht ist erfüllt, sobald die Wohnung geräumt ist und die Schlüssel fristgerecht übergeben wurden. Erscheint niemand, informieren Sie die Vermietung schriftlich und dokumentieren die Schlüsselübergabe. Im Zweifel senden Sie die Schlüssel per Einschreiben."
+              },
+              {
+                title: "Kann ich die Wohnung schon vor dem Mietende übergeben?",
+                text: "Ja, Sie können früher ausziehen und die Schlüssel abgeben. Schlagen Sie der Vermietung schriftlich einen früheren Termin vor. Wird der frühere Termin abgelehnt, können Sie die Schlüssel trotzdem per Einschreiben senden. Die Mietzahlungspflicht läuft bis Vertragsende weiter, eine Nutzungspflicht gibt es jedoch nicht."
               }
             ]
           },
@@ -711,6 +813,19 @@
                 answer: "Wenn Sie sich gezwungen fühlten, können Sie Ihre Unterschrift schriftlich widerrufen. Senden Sie rasch einen eingeschriebenen Brief an die Vermietung und erklären Sie, dass Sie unter Irrtum oder Druck unterschrieben haben. In der Praxis werden bei Streitfällen oft Kompromisse gesucht.",
                 extras: ["Schreibe den Widerruf möglichst sofort nach der Übergabe.", "Notiere Namen von Zeugen, die den Druck belegen können."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Muss ich das Übergabeprotokoll unterschreiben?",
+              "Wie reagiere ich bei strittigen Punkten?",
+              "Was tun bei Druck zur Unterschrift?"
+            ],
+            sections: [
+              {
+                title: "Muss ich das Wohnungsübergabe-Protokoll unterschreiben?",
+                text: "Nein. Unterschreiben Sie nur, wenn Sie mit dem Inhalt vollständig einverstanden sind. Eine Unterschrift bedeutet, dass Sie die festgehaltenen Mängel akzeptieren. Bei Streitpunkten können Sie die Unterschrift verweigern oder einen Zusatz wie „Unterschrift gilt nicht als Schuldanerkennung“ vermerken."
+              },
+              {
+                title: "Was kann ich tun, wenn ich ein Protokoll unter Druck unterschrieben habe?",
+                text: "Wenn Sie sich gezwungen fühlten, können Sie Ihre Unterschrift schriftlich widerrufen. Senden Sie rasch einen eingeschriebenen Brief an die Vermietung und erklären Sie, dass Sie unter Irrtum oder Druck unterschrieben haben. In der Praxis werden bei Streitfällen oft Kompromisse gesucht."
               }
             ]
           }
@@ -743,6 +858,20 @@
                 answer: "Bei einer nötigen Erneuerung zahlen Sie nicht den Neupreis, sondern den Zeitwert. Die Lebensdauer der Sache wird berücksichtigt. Ist eine Wandfarbe z.B. älter als die übliche Lebensdauer, trägt der Vermieter die Kosten.",
                 extras: ["Frage nach der Lebensdauertabelle, wenn Kosten verlangt werden.", "Lass dir den Berechnungsweg schriftlich erklären."],
                 sources: ["mieterverband.ch", "hev-winterthur.ch"]
+            questions: [
+              "Was zählt als normale Abnutzung?",
+              "Wann muss ich für Schäden bezahlen?",
+              "Wie wird der Zeitwert berechnet?",
+              "Wer trägt die Kosten bei alter Ausstattung?"
+            ],
+            sections: [
+              {
+                title: "Was gilt als normale Abnutzung – und für welche Schäden muss ich bezahlen?",
+                text: "Normale Abnutzung durch üblichen Gebrauch ist mit der Miete abgegolten und muss nicht bezahlt werden (z.B. leicht verblichene Wände, übliche Kratzer). Übermässige Abnutzung oder Beschädigungen wie Brandlöcher, tiefe Kratzer oder Sprünge müssen hingegen bezahlt werden."
+              },
+              {
+                title: "Dabei zählt der Zeitwert, nicht der Neupreis",
+                text: "Bei einer nötigen Erneuerung zahlen Sie nur den Zeitwert. Die Lebensdauer der Sache wird berücksichtigt. Ist eine Wandfarbe z.B. älter als die übliche Lebensdauer, trägt der Vermieter die Kosten."
               }
             ]
           },
@@ -780,6 +909,28 @@
                 answer: "Ja. Löcher sollten fachgerecht zugespachtelt, geschliffen und im passenden Farbton überstrichen werden, damit sie nicht mehr sichtbar sind. Sichtbar verbleibende Löcher gelten als Schaden und können verrechnet werden.",
                 extras: ["Für kleine Löcher reicht oft Fertigspachtel in Kombination mit Farbtupfern.", "Lass die Wand vollständig trocknen, bevor du überstreichst."],
                 sources: ["swisscaution.ch"]
+            questions: [
+              "Muss ich Wände weiss streichen?",
+              "Welche Umbauten muss ich rückgängig machen?",
+              "Was gehört zum kleinen Unterhalt?",
+              "Müssen Dübellöcher geschlossen werden?"
+            ],
+            sections: [
+              {
+                title: "Muss ich Wände neu streichen oder für Malerarbeiten aufkommen?",
+                text: "Grundsätzlich wird ein neutraler weisser Anstrich erwartet, wenn nichts anderes vereinbart ist. Knallige Farben oder starke Vergilbungen können kostenpflichtig sein. Normale Gebrauchsspuren gelten als übliche Abnutzung und müssen nicht bezahlt werden."
+              },
+              {
+                title: "Muss ich von mir durchgeführte bauliche Änderungen rückgängig machen?",
+                text: "Umbauten ohne Zustimmung müssen beim Auszug auf Wunsch des Vermieters rückgängig gemacht werden. Holen Sie für grössere Veränderungen immer eine schriftliche Zustimmung ein."
+              },
+              {
+                title: "Was zählt als „kleiner Unterhalt“ und was muss ich selbst erledigen?",
+                text: "Kleiner Unterhalt umfasst einfache, geringfügige Reparaturen wie Glühbirnen ersetzen, Armaturen entkalken, Abflüsse reinigen oder Dübellöcher sauber ausbessern. Arbeiten mit Fachkenntnis sind Sache des Vermieters."
+              },
+              {
+                title: "Müssen Dübel- und Bohrlöcher vor dem Auszug geschlossen werden?",
+                text: "Ja. Löcher sollten fachgerecht zugespachtelt, geschliffen und im passenden Farbton überstrichen werden, damit sie nicht mehr sichtbar sind."
               }
             ]
           },
@@ -803,6 +954,19 @@
                 answer: "Wenn keine Missbrauchsgefahr besteht, reicht oft ein Ersatzschlüssel. Besteht ein Sicherheitsrisiko, kann der Austausch des Schliesssystems nötig sein – dabei wird der Zeitwert berücksichtigt. Häufig übernimmt die Privathaftpflichtversicherung solche Kosten.",
                 extras: ["Melde den Verlust sofort deiner Versicherung.", "Frage nach dem Alter des Schlosses für die Zeitwertberechnung."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Darf der Vermieter später neue Schäden melden?",
+              "Was passiert bei versteckten Mängeln?",
+              "Muss ich bei Schlüsselverlust das Schloss zahlen?"
+            ],
+            sections: [
+              {
+                title: "Darf der Vermieter Wochen nach dem Auszug neue Schäden melden?",
+                text: "Mängel müssen bei der Rückgabe festgehalten und dem Mieter zeitnah mitgeteilt werden. Wird dies versäumt, sind Ansprüche in der Regel verwirkt. Versteckte Mängel müssen sofort nach Entdeckung gemeldet werden."
+              },
+              {
+                title: "Ich habe einen Wohnungsschlüssel verloren – muss ich das Schloss bezahlen?",
+                text: "Wenn keine Missbrauchsgefahr besteht, reicht oft ein Ersatzschlüssel. Besteht ein Sicherheitsrisiko, kann der Austausch des Schliesssystems nötig sein – dabei wird der Zeitwert berücksichtigt. Häufig übernimmt die Privathaftpflichtversicherung solche Kosten."
               }
             ]
           }
@@ -828,6 +992,15 @@
                 answer: "Nach ordnungsgemässer Übergabe sollte das Depot zeitnah freigegeben werden. Üblich ist eine Frist von etwa 30 Tagen. Ein Teil kann zurückbehalten werden, solange berechtigte Forderungen ungeklärt sind – aber nur verhältnismässig. Spätestens nach 12 Monaten ohne gerichtliche Ansprüche können Sie die Auszahlung direkt bei der Bank verlangen.",
                 extras: ["Prüfe, ob noch eine Nebenkostenabrechnung offen ist.", "Bestehe auf einer schriftlichen Bestätigung des Rückzahlungsstatus."],
                 sources: ["weka.ch"]
+            questions: [
+              "Wann bekomme ich die Kaution zurück?",
+              "Darf der Vermieter Geld zurückbehalten?",
+              "Wie lange darf die Freigabe dauern?"
+            ],
+            sections: [
+              {
+                title: "Wann muss der Vermieter meine Mietkaution zurückzahlen?",
+                text: "Nach ordnungsgemässer Übergabe sollte das Depot zeitnah freigegeben werden. Üblich ist eine Frist von etwa 30 Tagen. Ein Teil kann zurückbehalten werden, solange berechtigte Forderungen ungeklärt sind – aber nur verhältnismässig. Spätestens nach 12 Monaten ohne gerichtliche Ansprüche können Sie die Auszahlung direkt bei der Bank verlangen."
               }
             ]
           },
@@ -844,6 +1017,15 @@
                 answer: "Fordern Sie die Freigabe schriftlich und setzen Sie eine Frist. Reagiert die Vermietung nicht, können Sie bei der Schlichtungsbehörde Klage auf Rückzahlung einreichen. Nach einem Jahr ohne rechtliche Schritte muss die Bank das Geld an Sie auszahlen.",
                 extras: ["Sende Forderungen per Einschreiben, damit du einen Nachweis hast.", "Lege Kopien des Übergabeprotokolls bei."],
                 sources: ["mieterverband.ch"]
+            questions: [
+              "Was kann ich tun, wenn der Vermieter nicht zahlt?",
+              "Wie fordere ich die Kaution schriftlich zurück?",
+              "Wann kann ich die Bank direkt anweisen?"
+            ],
+            sections: [
+              {
+                title: "Was kann ich tun, wenn der Vermieter die Kaution nicht zurückzahlt?",
+                text: "Fordern Sie die Freigabe schriftlich und setzen Sie eine Frist. Reagiert die Vermietung nicht, können Sie bei der Schlichtungsbehörde Klage auf Rückzahlung einreichen. Nach einem Jahr ohne rechtliche Schritte muss die Bank das Geld an Sie auszahlen."
               }
             ]
           }
@@ -876,6 +1058,19 @@
                 answer: "Lege Mietvertrag, Übergabeprotokoll, Fotos des Wohnungszustands und allfällige Rechnungen bereit. So kannst du Rückfragen schnell klären.",
                 extras: ["Digitale Kopien auf dem Handy sind am Übergabetag praktisch.", "Notiere Ansprechpartner und Telefonnummern der Verwaltung."],
                 sources: ["Internes Know-how"]
+            questions: [
+              "Welche Schritte sollte ich zuerst planen?",
+              "Welche Räume sollte ich priorisieren?",
+              "Welche Unterlagen sollte ich bereithalten?"
+            ],
+            sections: [
+              {
+                title: "Welche Schritte sollte ich vor der Übergabe planen?",
+                text: "Plane mindestens zwei Wochen Puffer für die Endreinigung, kleine Reparaturen und die Terminabstimmung. Erstelle eine Aufgabenliste für Küche, Bad, Fenster, Böden und Keller und hake erledigte Punkte ab."
+              },
+              {
+                title: "Was gehört in meine Unterlagenmappe?",
+                text: "Lege Mietvertrag, Übergabeprotokoll, Fotos des Wohnungszustands und allfällige Rechnungen bereit. So kannst du Rückfragen schnell klären."
               }
             ]
           },
@@ -899,6 +1094,19 @@
                 answer: "Halte Absprachen schriftlich fest, dokumentiere den Zustand der Wohnung mit Fotos und bringe alle Schlüssel geordnet mit. Ein ruhiger, vorbereiteter Ablauf reduziert Konflikte.",
                 extras: ["Eine zweite Person als Begleitung kann helfen, Details zu belegen.", "Notiere offene Punkte direkt im Protokoll."],
                 sources: ["Internes Know-how"]
+            questions: [
+              "Wie bestätige ich Termine richtig?",
+              "Was hilft gegen Missverständnisse?",
+              "Wie läuft eine stressfreie Abnahme ab?"
+            ],
+            sections: [
+              {
+                title: "Wie kommuniziere ich am besten mit der Vermietung?",
+                text: "Bestätige Termine schriftlich, halte Absprachen kurz fest und dokumentiere wichtige Punkte. So vermeidest du Missverständnisse und hast einen klaren Nachweis."
+              },
+              {
+                title: "Was hilft bei einer stressfreien Abnahme?",
+                text: "Ein letzter Rundgang am Vortag, ein sauberes Abnahmeprotokoll und ein Set Ersatzschlüssel vereinfachen den Termin. Bei Unsicherheiten lohnt es sich, eine zweite Person als Zeugin mitzunehmen."
               }
             ]
           }
@@ -943,6 +1151,12 @@
         const top = element.getBoundingClientRect().top + window.scrollY - offset;
         window.scrollTo({ top, behavior: "smooth" });
       });
+    let activeCategory = null;
+
+    const showView = (viewName) => {
+      Object.values(views).forEach(view => view.classList.remove("active"));
+      views[viewName].classList.add("active");
+      window.scrollTo({ top: 0, behavior: "smooth" });
     };
 
     const renderHome = () => {
@@ -992,6 +1206,8 @@
           <ul class="subcat-list">
             ${topic.articles.map(article => `
               <li><button class="link-btn subcat-link" data-topic="${topic.id}" data-article="${article.id}" type="button">${article.question}</button></li>
+            ${topic.questions.map(question => `
+              <li><button class="link-btn subcat-link" data-topic="${topic.id}" type="button">${question}</button></li>
             `).join("")}
           </ul>
         </div>
@@ -1002,6 +1218,17 @@
           const topic = category.topics.find(item => item.id === button.dataset.topic);
           const article = topic.articles.find(item => item.id === button.dataset.article);
           renderArticle(category, topic, article);
+        <button class="subcat-card" data-topic="${topic.id}" type="button">
+          <span class="subcat-icon">${topic.icon}</span>
+          <h3>${topic.title}</h3>
+          <p>${topic.description}</p>
+        </button>
+      `).join("");
+
+      subcategoryGrid.querySelectorAll("button").forEach(button => {
+        button.addEventListener("click", () => {
+          const topic = category.topics.find(item => item.id === button.dataset.topic);
+          renderArticle(category, topic);
         });
       });
 
@@ -1073,6 +1300,37 @@
             <input type="text" placeholder="Optional: kurzer Kommentar" />
             <button class="btn btn-primary" type="button">Feedback senden</button>
           </div>
+    };
+
+    const renderArticle = (category, topic) => {
+      const sectionsMarkup = topic.sections.map((section, index) => {
+        const anchor = `section-${index}`;
+        return `
+          <div class="article-section" id="${anchor}">
+            <h3>${section.title}</h3>
+            <p>${section.text}</p>
+          </div>
+        `;
+      }).join("");
+
+      articleContent.innerHTML = `
+        <div class="breadcrumb">
+          <span>Help Center</span>
+          <span>•</span>
+          <span>${category.title}</span>
+          <span>•</span>
+          <span>${topic.title}</span>
+          <span class="pill">Kategorie: ${category.title}</span>
+        </div>
+        <h2>${topic.title}</h2>
+        <p>${topic.description}</p>
+        ${sectionsMarkup}
+        <div class="feedback" id="feedback">
+          <h4>War der Artikel hilfreich?</h4>
+          <div class="feedback-actions">
+            <button class="btn btn-primary" data-feedback="yes" type="button">Ja, danke!</button>
+            <button class="btn btn-outline" data-feedback="no" type="button">Nicht wirklich</button>
+          </div>
           <div class="feedback-thanks" id="feedbackThanks" style="display:none;">Danke! Dein Feedback hilft uns, die Inhalte weiter zu verbessern.</div>
           <form class="feedback-form" id="feedbackForm" style="display:none;">
             <div class="feedback-options">
@@ -1092,6 +1350,9 @@
         <a href="#section-answer">Antwort</a>
         ${article.extras && article.extras.length ? `<a href="#section-extras">Zusatzinfos</a>` : ""}
         <a href="#section-sources">Quellen</a>
+        ${topic.sections.map((section, index) => `
+          <a href="#section-${index}">${section.title}</a>
+        `).join("")}
       `;
 
       const feedbackButtons = articleContent.querySelectorAll("[data-feedback]");
@@ -1141,6 +1402,9 @@
           } else {
             feedbackActions.style.display = "none";
             feedbackQuick.style.display = "none";
+            feedbackThanks.style.display = "block";
+            feedbackForm.style.display = "none";
+          } else {
             feedbackThanks.style.display = "none";
             feedbackForm.style.display = "grid";
           }
@@ -1170,6 +1434,20 @@
       })));
     };
 
+    const buildSearchIndex = () => {
+      searchIndex = helpData.flatMap(category => category.topics.map(topic => {
+        const sectionText = topic.sections.map(section => `${section.title} ${section.text}`).join(" ");
+        const keywordText = (topic.keywords || []).join(" ");
+        const questionText = (topic.questions || []).join(" ");
+        return {
+          category,
+          topic,
+          content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${questionText} ${sectionText}`.toLowerCase(),
+          snippet: topic.sections[0]?.text || ""
+        };
+      }));
+    };
+
     const matchResults = (query) => {
       const terms = query.toLowerCase().split(/\s+/).filter(Boolean);
       if (!terms.length) return [];
@@ -1193,6 +1471,11 @@
 
     const renderSuggestions = (query) => {
       const results = matchResults(query).slice(0, 4);
+      return searchIndex.filter(item => terms.every(term => item.content.includes(term)));
+    };
+
+    const renderSuggestions = (query) => {
+      const results = matchResults(query).slice(0, 5);
       if (!results.length) {
         searchSuggestions.classList.remove("active");
         searchSuggestions.innerHTML = "";
@@ -1202,6 +1485,8 @@
       searchSuggestions.innerHTML = results.map(result => `
         <div class="search-suggestion" data-category="${result.category.id}" data-topic="${result.topic.id}" data-article="${result.article.id}">
           <strong>${result.article.question}</strong> · ${result.topic.title}
+        <div class="search-suggestion" data-category="${result.category.id}" data-topic="${result.topic.id}">
+          <strong>${result.topic.title}</strong> · ${result.category.title}
         </div>
       `).join("");
       searchSuggestions.querySelectorAll(".search-suggestion").forEach(item => {
@@ -1210,6 +1495,7 @@
           const topic = category.topics.find(entry => entry.id === item.dataset.topic);
           const article = topic.articles.find(entry => entry.id === item.dataset.article);
           renderArticle(category, topic, article);
+          renderArticle(category, topic);
           searchSuggestions.classList.remove("active");
         });
       });
@@ -1223,6 +1509,8 @@
       searchResults.innerHTML = results.map(result => `
         <div class="search-result-card" data-category="${result.category.id}" data-topic="${result.topic.id}" data-article="${result.article.id}">
           <h3>${result.article.question}</h3>
+        <div class="search-result-card" data-category="${result.category.id}" data-topic="${result.topic.id}">
+          <h3>${result.topic.title}</h3>
           <p>${result.snippet}</p>
         </div>
       `).join("");
@@ -1236,6 +1524,10 @@
       });
       showView("search");
       scrollToElement(searchResultsTitle);
+          renderArticle(category, topic);
+        });
+      });
+      showView("search");
     };
 
     const handleSearchSubmit = () => {
@@ -1260,6 +1552,9 @@
     searchBtn.addEventListener("click", handleSearchSubmit);
 
     buildSearchIndex();
+    backToHome.addEventListener("click", () => showView("home"));
+    backToCategory.addEventListener("click", () => renderCategory(activeCategory));
+
     renderHome();
   </script>
 </body>
