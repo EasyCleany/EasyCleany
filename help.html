@@ -68,7 +68,6 @@
       font-size:clamp(2.2rem, 4vw, 3.6rem);
       font-weight:900;
       letter-spacing:-0.02em;
-      color:#fff;
     }
     .hero p{
       margin:0 0 24px;
@@ -122,9 +121,6 @@
       cursor:pointer;
       font-weight:600;
       color:var(--muted);
-      display:flex;
-      flex-direction:column;
-      gap:6px;
     }
     .search-suggestion:last-child{border-bottom:none;}
     .search-suggestion strong{color:var(--accent-dark);}
@@ -304,7 +300,6 @@
       padding:18px 20px;
       border-radius:18px;
     }
-    .search-results-head h2{margin:0; color:#fff; font-size:2rem;}
     .search-results-head h2{margin:0; color:#fff; font-size:1.4rem;}
     .search-results-meta{color:rgba(255,255,255,.85);}
     .search-results-grid{
@@ -321,7 +316,6 @@
       transition:transform .15s ease, border-color .15s ease;
     }
     .search-result-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
-    .search-result-card h3{margin:0 0 8px; font-size:1.05rem;}
     .search-result-card h3{margin:0 0 8px;}
     .search-result-card p{
       margin:0;
@@ -331,22 +325,6 @@
       -webkit-box-orient:vertical;
       overflow:hidden;
     }
-    .category-tag{
-      display:inline-flex;
-      align-items:center;
-      justify-content:center;
-      padding:6px 12px;
-      border-radius:10px;
-      font-weight:700;
-      font-size:.75rem;
-      color:#fff;
-      width:max-content;
-    }
-    .category-tag[data-category="reinigung"]{background:#6f3ccf;}
-    .category-tag[data-category="uebergabe"]{background:#ff8c6a;}
-    .category-tag[data-category="schaeden"]{background:#2e7dd7;}
-    .category-tag[data-category="kaution"]{background:#1f9d6e;}
-    .category-tag[data-category="allgemeines"]{background:#8b5a2b;}
 
     .article-layout{
       display:grid;
@@ -569,7 +547,6 @@
   <div class="help-app">
     <section class="hero">
       <div class="hero-inner">
-        <h1>Grüezi! Was ist deine Frage?</h1>
         <h1>Hallo! Wie können wir dir helfen?</h1>
         <p>Finde Antworten rund um Endreinigung, Wohnungsübergabe und Mietrecht – kompakt, klar und in deinem Stil.</p>
         <div class="searchbar" aria-label="Hilfe durchsuchen">
@@ -856,13 +833,6 @@
                 answer: "Ja. Löcher sollten fachgerecht zugespachtelt, geschliffen und im passenden Farbton überstrichen werden, damit sie nicht mehr sichtbar sind. Sichtbar verbleibende Löcher gelten als Schaden und können verrechnet werden.",
                 extras: ["Für kleine Löcher reicht oft Fertigspachtel in Kombination mit Farbtupfern.", "Lass die Wand vollständig trocknen, bevor du überstreichst."],
                 sources: ["swisscaution.ch"]
-              },
-              {
-                id: "schaeden-duebel-fuellen",
-                question: "Wie fülle ich Dübellöcher richtig?",
-                answer: "Dübellöcher sollten sauber gefüllt werden, damit die Wand wieder glatt wirkt. Entferne zuerst den Dübel, entferne lose Reste, fülle das Loch mit Spachtelmasse und glätte die Oberfläche. Nach dem Trocknen kannst du die Stelle leicht schleifen und im passenden Farbton überstreichen.",
-                extras: ["Arbeite in dünnen Schichten, damit die Spachtelmasse gleichmässig trocknet.", "Bei tiefen Löchern hilft es, die Masse in zwei Schritten aufzutragen."],
-                sources: ["EasyCleany Blog"]
               }
             ]
           },
@@ -1300,8 +1270,6 @@
       searchSuggestions.classList.add("active");
       searchSuggestions.innerHTML = results.map(result => `
         <div class="search-suggestion" data-category="${result.category.id}" data-topic="${result.topic.id}" data-article="${result.article.id}">
-          <strong>${result.article.question}</strong>
-          <span class="category-tag" data-category="${result.category.id}">${result.category.title}</span>
           <strong>${result.article.question}</strong> · ${result.topic.title}
         </div>
       `).join("");
@@ -1326,7 +1294,6 @@
       searchResults.innerHTML = results.map(result => `
         <div class="search-result-card" data-category="${result.category.id}" data-topic="${result.topic.id}" data-article="${result.article.id}">
           <h3>${result.article.question}</h3>
-          <span class="category-tag" data-category="${result.category.id}">${result.category.title}</span>
           <p>${result.snippet}</p>
         </div>
       `).join("");
