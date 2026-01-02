@@ -163,22 +163,7 @@ async function main() {
   await buildTipps();
   // Root Landing Page für /
   const rootIndexHtml = `<!doctype html>
-<html lang="de">
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Easy Cleany Portal</title>
-  <meta http-equiv="refresh" content="0; url=./profi-tipps/">
-</head>
-<body>
-  <p>Weiterleitung… <a href="./profi-tipps/">Profi-Tipps öffnen</a></p>
-  <ul>
-    <li><a href="./services/">Services</a></li>
-    <li><a href="./deine-offerte/">Deine Offerte</a></li>
-    <li><a href="./help/">Help</a></li>
-  </ul>
-</body>
-</html>`;
+
   await fsp.writeFile(path.join(OUT_DIR, "index.html"), rootIndexHtml, "utf8");
 
   console.log("✅ Build komplett: docs/ ist bereit für Deploy");
