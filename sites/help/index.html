@@ -6,7 +6,7 @@
   <title>Help | Easy Cleany</title>
   <style>
     :root{
-      --bg:#efe6f8;
+      --bg:#f6f3fb;
       --card:#ffffff;
       --text:#1d1330;
       --muted:#6a5f7d;
@@ -83,7 +83,7 @@
       display:flex;
       align-items:center;
       gap:10px;
-      padding:14px 18px;
+      padding:12px 16px;
       box-shadow:var(--shadow);
       color:var(--muted);
     }
@@ -92,13 +92,13 @@
       border:none;
       outline:none;
       flex:1;
-      font-size:1.15rem;
+      font-size:1rem;
     }
     .search-btn{
       border:none;
       background:var(--accent);
       color:#fff;
-      padding:12px 20px;
+      padding:10px 18px;
       border-radius:12px;
       font-weight:700;
       cursor:pointer;
@@ -142,7 +142,7 @@
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
       gap:22px;
-      margin-top:30px;
+      margin-top:-60px;
     }
     @media (max-width: 980px){
       .category-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
@@ -155,7 +155,7 @@
       border-radius:20px;
       padding:28px 24px;
       box-shadow:var(--shadow);
-      border:1px solid rgba(131,60,207,.18);
+      border:1px solid var(--line);
       display:flex;
       flex-direction:column;
       align-items:center;
@@ -174,13 +174,13 @@
     }
     .category-card h3{
       margin:0;
-      font-size:1.3rem;
+      font-size:1.2rem;
       font-weight:800;
     }
     .category-card p{
       margin:0;
       color:var(--muted);
-      font-size:1rem;
+      font-size:.95rem;
       line-height:1.4;
     }
 
@@ -269,37 +269,17 @@
       font-size:1.4rem;
       color:var(--accent-dark);
     }
-    .subcat-card h3{margin:0; font-size:1.25rem;}
-    .subcat-card p{margin:0; color:var(--muted); font-size:1rem;}
+    .subcat-card h3{margin:0; font-size:1.1rem;}
+    .subcat-card p{margin:0; color:var(--muted); font-size:.92rem;}
     .subcat-list{
       margin:0;
       padding-left:18px;
       color:var(--muted);
-      font-size:1rem;
+      font-size:.92rem;
       line-height:1.5;
       display:flex;
       flex-direction:column;
       gap:8px;
-    }
-    .subcat-section{display:flex; flex-direction:column; gap:8px;}
-    .subcat-section.is-hidden{display:none;}
-    .subcat-section-title{
-      margin:8px 0 0;
-      font-size:.95rem;
-      font-weight:800;
-      color:var(--accent-dark);
-      text-transform:uppercase;
-      letter-spacing:.04em;
-    }
-    .subcat-toggle{
-      margin-top:6px;
-      color:var(--accent-dark);
-      font-weight:700;
-      background:none;
-      border:none;
-      text-align:left;
-      cursor:pointer;
-      padding:0;
     }
     .subcat-list li{margin:0;}
     .subcat-link{
@@ -340,11 +320,10 @@
       transition:transform .15s ease, border-color .15s ease;
     }
     .search-result-card:hover{transform:translateY(-3px); border-color:rgba(131,60,207,.4);}
-    .search-result-card h3{margin:0 0 10px; font-size:2rem;}
+    .search-result-card h3{margin:0 0 8px; font-size:1.05rem;}
     .search-result-card p{
       margin:0;
       color:var(--muted);
-      font-size:1.05rem;
       display:-webkit-box;
       -webkit-line-clamp:3;
       -webkit-box-orient:vertical;
@@ -360,17 +339,6 @@
       font-size:.75rem;
       color:#fff;
       width:max-content;
-      margin:6px 0 12px;
-    }
-    .search-results-more{
-      display:flex;
-      justify-content:center;
-      margin-top:18px;
-    }
-    .search-results-toggle{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
     }
     .category-tag[data-category="reinigung"]{background:#6f3ccf;}
     .category-tag[data-category="uebergabe"]{background:#ff8c6a;}
@@ -600,7 +568,7 @@
     <section class="hero">
       <div class="hero-inner">
         <h1>Grüezi! Was ist deine Frage?</h1>
-        <p>Finde Antworten rund um Endreinigung, Wohnungsübergabe und Mietrecht – kompakt, klar und einfach erklärt.</p>
+        <p>Finde Antworten rund um Endreinigung, Wohnungsübergabe und Mietrecht – kompakt, klar und in deinem Stil.</p>
         <div class="searchbar" aria-label="Hilfe durchsuchen">
           <span>🔍</span>
           <input id="searchInput" type="search" placeholder="Thema suchen (z.B. Abnahmeprotokoll, Kaution, Besenrein)" />
@@ -621,10 +589,8 @@
             <h2 id="searchResultsTitle">Suchergebnisse</h2>
             <div class="search-results-meta" id="searchResultsMeta">Gib oben einen Begriff ein.</div>
           </div>
-          <button class="btn btn-outline" id="goToOverview" type="button">Zur Übersicht</button>
         </div>
         <div class="search-results-grid" id="searchResults"></div>
-        <div class="search-results-more" id="searchResultsMore"></div>
         <div class="feedback-request" id="searchRequest">
           <h3>Nichts passendes gefunden?</h3>
           <p>Schick uns deine Frage – wir ergänzen den passenden Artikel.</p>
@@ -1039,8 +1005,6 @@
     const searchResults = document.getElementById("searchResults");
     const searchResultsMeta = document.getElementById("searchResultsMeta");
     const searchResultsTitle = document.getElementById("searchResultsTitle");
-    const searchResultsMore = document.getElementById("searchResultsMore");
-    const goToOverview = document.getElementById("goToOverview");
     const searchRequest = document.getElementById("searchRequest");
     const openSearchRequest = document.getElementById("openSearchRequest");
     const searchRequestForm = document.getElementById("searchRequestForm");
@@ -1054,7 +1018,6 @@
     let searchIndex = [];
     let lastSearchQuery = "";
     let articleBackTarget = "category";
-    let searchExpanded = false;
 
     const showView = (viewName) => {
       Object.values(views).forEach(view => view.classList.remove("active"));
@@ -1119,32 +1082,6 @@
         .trim();
     };
 
-    const formatMarkdownHtml = (markdown) => {
-      const blocks = String(markdown || "").split(/\n\s*\n/);
-      const html = [];
-      blocks.forEach(block => {
-        const trimmed = block.trim();
-        if (!trimmed) return;
-        const headingMatch = trimmed.match(/^(#{1,3})\s+(.*)$/);
-        if (headingMatch) {
-          const level = headingMatch[1].length === 1 ? "h2" : "h3";
-          html.push(`<${level}>${stripMarkdown(headingMatch[2])}</${level}>`);
-          return;
-        }
-        const lines = trimmed.split(/\r?\n/).map(line => line.trim()).filter(Boolean);
-        const isList = lines.every(line => /^(\d+\.)|[-*]\s+/.test(line));
-        if (isList) {
-          const items = lines.map(line => line.replace(/^(\d+\.)|[-*]\s+/, ""));
-          const listItems = items.map(item => `<li>${stripMarkdown(item)}</li>`).join("");
-          const isOrdered = lines.some(line => /^\d+\./.test(line));
-          html.push(isOrdered ? `<ol>${listItems}</ol>` : `<ul>${listItems}</ul>`);
-          return;
-        }
-        html.push(`<p>${stripMarkdown(trimmed)}</p>`);
-      });
-      return html.join("");
-    };
-
     const buildSummary = (text) => {
       if (!text) return "";
       const clipped = text.slice(0, 320);
@@ -1160,10 +1097,6 @@
       return {
         id: `blog-${filename.replace(/\.md$/, "")}`,
         question: title,
-        answer: cleanBody || "Dieser Beitrag wird demnächst ergänzt.",
-        answerHtml: formatMarkdownHtml(body),
-        fullText: cleanBody,
-        summary,
         answer: summary || "Dieser Beitrag wird demnächst ergänzt.",
         fullText: cleanBody,
         keywords: Array.isArray(data.keywords) ? data.keywords : [],
@@ -1242,59 +1175,24 @@
       categoryTitle.textContent = category.title;
       categorySubtitle.textContent = category.description;
       renderCategoryTabs(category.id);
-      subcategoryGrid.innerHTML = category.topics.map(topic => {
-        const sections = [];
-        for (let i = 0; i < topic.articles.length; i += 5) {
-          const chunk = topic.articles.slice(i, i + 5);
-          const titleSuffix = Math.floor(i / 5) + 1;
-          sections.push({
-            id: `${topic.id}-section-${titleSuffix}`,
-            title: `${topic.title} – Abschnitt ${titleSuffix}`,
-            articles: chunk
-          });
-        }
-        const sectionsMarkup = sections.map((section, index) => `
-          <div class="subcat-section ${index > 0 ? "is-hidden" : ""}" data-section="${section.id}">
-            <div class="subcat-section-title">${section.title}</div>
-            <ul class="subcat-list">
-              ${section.articles.map(article => `
-                <li><button class="link-btn subcat-link" data-topic="${topic.id}" data-article="${article.id}" type="button">${article.question}</button></li>
-              `).join("")}
-            </ul>
-          </div>
-        `).join("");
-        const toggleMarkup = sections.length > 1
-          ? `<button class="subcat-toggle" data-topic="${topic.id}" type="button">Mehr anzeigen ↓</button>`
-          : "";
-        return `
+      subcategoryGrid.innerHTML = category.topics.map(topic => `
         <div class="subcat-card" data-topic="${topic.id}">
           <span class="subcat-icon">${topic.icon}</span>
           <h3>${topic.title}</h3>
           <p>${topic.description}</p>
-          ${sectionsMarkup}
-          ${toggleMarkup}
+          <ul class="subcat-list">
+            ${topic.articles.map(article => `
+              <li><button class="link-btn subcat-link" data-topic="${topic.id}" data-article="${article.id}" type="button">${article.question}</button></li>
+            `).join("")}
+          </ul>
         </div>
-      `;
-      }).join("");
+      `).join("");
 
       subcategoryGrid.querySelectorAll(".subcat-link").forEach(button => {
         button.addEventListener("click", () => {
           const topic = category.topics.find(item => item.id === button.dataset.topic);
           const article = topic.articles.find(item => item.id === button.dataset.article);
           renderArticle(category, topic, article);
-        });
-      });
-      subcategoryGrid.querySelectorAll(".subcat-toggle").forEach(toggle => {
-        toggle.addEventListener("click", () => {
-          const card = toggle.closest(".subcat-card");
-          const sections = card.querySelectorAll(".subcat-section");
-          const expanded = toggle.dataset.expanded === "true";
-          sections.forEach((section, index) => {
-            if (index === 0) return;
-            section.classList.toggle("is-hidden", expanded);
-          });
-          toggle.dataset.expanded = expanded ? "false" : "true";
-          toggle.textContent = expanded ? "Mehr anzeigen ↓" : "Weniger anzeigen ↑";
         });
       });
 
@@ -1334,9 +1232,6 @@
           </ul>
         </div>
       `;
-      const answerMarkup = article.answerHtml
-        ? article.answerHtml
-        : `<p>${article.answer}</p>`;
 
       articleContent.innerHTML = `
         <div class="breadcrumb">
@@ -1360,7 +1255,7 @@
         </div>
         <div class="article-section" id="section-answer">
           <h3>Antwort</h3>
-          ${answerMarkup}
+          <p>${article.answer}</p>
         </div>
         ${extrasMarkup}
         ${sourcesMarkup}
@@ -1458,7 +1353,6 @@
         const articleKeywords = (article.keywords || []).join(" ").toLowerCase();
         const extrasText = (article.extras || []).join(" ").toLowerCase();
         const fullText = (article.fullText || "").toLowerCase();
-        const snippetText = article.summary || article.answer || "";
         return {
           category,
           topic,
@@ -1468,7 +1362,6 @@
           keywordText,
           bodyText: `${article.answer} ${fullText} ${extrasText}`.toLowerCase(),
           content: `${category.title} ${category.subtitle} ${topic.title} ${topic.description} ${keywordText} ${articleKeywords} ${article.question} ${article.answer} ${fullText} ${extrasText}`.toLowerCase(),
-          snippet: snippetText || buildSummary(article.fullText || "")
           snippet: article.answer || buildSummary(article.fullText || "")
         };
       })));
@@ -1522,16 +1415,12 @@
 
     const renderSearchResults = (query) => {
       const results = matchResults(query);
-      if (query !== lastSearchQuery) {
-        searchExpanded = false;
-      }
       lastSearchQuery = query;
       articleBackTarget = "search";
       searchResultsMeta.textContent = results.length
         ? `${results.length} passende Artikel für „${query}“`
         : `Keine Treffer für „${query}“`;
-      const visibleResults = searchExpanded ? results : results.slice(0, 8);
-      searchResults.innerHTML = visibleResults.map(result => `
+      searchResults.innerHTML = results.map(result => `
         <div class="search-result-card" data-category="${result.category.id}" data-topic="${result.topic.id}" data-article="${result.article.id}">
           <h3>${result.article.question}</h3>
           <span class="category-tag" data-category="${result.category.id}">${result.category.title}</span>
@@ -1546,20 +1435,6 @@
           renderArticle(category, topic, article);
         });
       });
-      if (results.length > 8) {
-        searchResultsMore.innerHTML = `
-          <button class="btn btn-outline search-results-toggle" type="button">
-            ${searchExpanded ? "Weniger anzeigen ↑" : "Mehr anzeigen ↓"}
-          </button>
-        `;
-        const toggle = searchResultsMore.querySelector("button");
-        toggle.addEventListener("click", () => {
-          searchExpanded = !searchExpanded;
-          renderSearchResults(query);
-        });
-      } else {
-        searchResultsMore.innerHTML = "";
-      }
       showView("search");
       scrollToElement(searchResultsTitle);
     };
@@ -1570,7 +1445,6 @@
         showView("home");
         return;
       }
-      searchExpanded = false;
       renderSearchResults(query);
       searchSuggestions.classList.remove("active");
     };
@@ -1592,7 +1466,6 @@
       }
     });
     searchBtn.addEventListener("click", handleSearchSubmit);
-    goToOverview.addEventListener("click", () => showView("home"));
     openSearchRequest.addEventListener("click", () => {
       const queryText = lastSearchQuery ? `Ich habe gesucht nach: ${lastSearchQuery}.` : "Ich habe keine passende Antwort gefunden.";
       requestDescription.value = `${queryText}\n\nMeine Frage:`.trim();
