@@ -316,6 +316,12 @@
     margin-left:auto;
     margin-right:0;
     flex:0 0 360px;
+    flex:0 1 620px;
+    max-width: 620px;
+  }
+  #ecpt .ecpt-popular-block{
+    margin-left:auto;
+    flex:0 0 320px;
     align-self:flex-start;
     background:rgba(255,255,255,.9);
     border:1px solid var(--line);
@@ -340,6 +346,7 @@
     max-width:none;
     margin-top:6px;
   }
+  #ecpt #ecptResultsWrap{ max-width: 620px; }
   #ecpt .ecpt-line{
     background:#fff;
     border:1px solid rgba(230,238,235,.95);
@@ -359,11 +366,13 @@
     display:grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     gap:0;
+    gap:10px;
     padding-bottom: 2px;
   }
   #ecpt .ecpt-popcard{
     width:100%;
     aspect-ratio: 4 / 3;
+    aspect-ratio: 1 / 1;
     background:#fff;
     border:1px solid var(--line);
     border-radius: 18px;
@@ -396,6 +405,7 @@
     padding:10px 12px 12px;
     text-align:left;
     height:45%;
+    height:42%;
     display:flex;
     flex-direction:column;
     justify-content:center;
@@ -404,6 +414,7 @@
     font-weight:950;
     line-height:1.25;
     font-size:.98rem;
+    font-size:.9rem;
     margin:0;
     color: var(--accent2);
   }
@@ -412,6 +423,8 @@
     color:var(--muted);
     font-weight:600;
     font-size:.76rem;
+    font-weight:800;
+    font-size:.78rem;
     line-height:1.3;
   }
 
@@ -559,6 +572,7 @@
     color: var(--text);
     font-weight:600;
     font-size:.95rem;
+    font-weight:850;
     white-space: pre-wrap;
   }
   #ecpt .ecpt-bubble.ecpt-me{ flex-direction:row-reverse; }
@@ -1196,6 +1210,8 @@
         <div class="ecpt-popbody">
           <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 90))}</p>
           <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 110))}</p>
+          <p class="ecpt-poptitle">${escapeHtml(clampStr(it.title, 60))}</p>
+          <p class="ecpt-popdesc">${escapeHtml(clampStr(it.excerpt || "Artikel öffnen", 80))}</p>
         </div>
       `;
       card.addEventListener("click", () => {
@@ -1815,6 +1831,9 @@
           (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKonnte ich dein Anliegen klären?",
           [],
           { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
+          (best.answer || best.excerpt || "Ich habe dazu eine passende FAQ gefunden.") + "\n\nKann ich dir noch weiterhelfen?",
+          [],
+          { prefixNodes: [btn] }
         );
         return;
       }
@@ -1855,6 +1874,9 @@
         excerpt + "\n\nKonnte ich dein Anliegen klären?",
         [],
         { prefixNodes: [btn], appendNodes: [createResolutionActions(q)] }
+        excerpt + "\n\nKann ich dir noch weiterhelfen?",
+        [],
+        { prefixNodes: [btn] }
       );
       return;
     }
@@ -1864,6 +1886,13 @@
       "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du dein Anliegen genauer erklären oder die Frage direkt an uns schicken?",
       [],
       { appendNodes: [createQuestionForm(q)] }
+    const createBtn = mkBtn("Neue Frage stellen", "accent", true);
+    createBtn.onclick = () => openNewQuestionForm(q, "requireDetails");
+    lastBotAskedMore = true;
+    botTypewriter(
+      "Ich finde dazu gerade keinen passenden Artikel oder FAQ auf dieser Seite.\n\nMöchtest du, dass ich deine Frage als offene Frage aufnehme?",
+      [],
+      { appendNodes: [createBtn] }
     );
   }
 
