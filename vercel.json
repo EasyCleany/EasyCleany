@@ -1,0 +1,9 @@
+{
+  "version": 2,
+  "public": "docs",
+  "cleanUrls": true,
+  "trailingSlash": false,
+  "routes": [
+    { "src": "/(.*)", "dest": "/$1" }
+  ]
+}
