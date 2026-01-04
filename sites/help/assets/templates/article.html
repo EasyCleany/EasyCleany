@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="de">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{title}} | Easy Cleany</title>
+  <link rel="stylesheet" href="../assets/css/site.css" />
+</head>
+<body class="help-article">
+  <header class="help-article__hero">
+    <div class="help-article__hero-inner">
+      <a class="help-article__back" href="{{backUrl}}">← Zur Help-Übersicht</a>
+      <p class="help-article__eyebrow">Easy Cleany Help Center</p>
+      <h1>{{title}}</h1>
+      {{meta}}
+    </div>
+  </header>
+
+  <main class="help-article__content">
+    <div class="help-article__layout">
+      <article class="help-article__card" id="articleBody">
+        {{body}}
+
+        <section class="help-article__feedback" id="articleFeedback">
+          <h4>War der Artikel hilfreich?</h4>
+          <div class="feedback-actions">
+            <button class="btn btn-primary" data-feedback="yes" type="button">Ja klar</button>
+            <button class="btn btn-outline" data-feedback="no" type="button">Nicht wirklich</button>
+          </div>
+
+          <div class="feedback-quick" id="feedbackQuick" style="display:none;">
+            <input type="text" placeholder="Optional: kurzer Kommentar" />
+            <button class="btn btn-primary" type="button">Feedback senden</button>
+          </div>
+
+          <div class="feedback-thanks" id="feedbackThanks" style="display:none;">
+            Danke! Dein Feedback hilft uns, die Inhalte weiter zu verbessern.
+          </div>
+
+          <form class="feedback-form" id="feedbackForm" style="display:none;">
+            <div class="feedback-options">
+              <label><input type="radio" name="feedbackReason" /> Dieser Artikel hat meine Fragen nicht beantwortet</label>
+              <label><input type="radio" name="feedbackReason" /> Ich fand diesen Artikel verwirrend oder schwer lesbar</label>
+              <label><input type="radio" name="feedbackReason" /> Mir gefällt nicht, wie der Ablauf erklärt wurde</label>
+              <label><input type="radio" name="feedbackReason" /> Sonstiges</label>
+            </div>
+            <textarea placeholder="Gibt es noch etwas, das du uns mitteilen möchtest?"></textarea>
+            <button class="btn btn-primary" type="button">Feedback senden</button>
+          </form>
+        </section>
+      </article>
+
+      <aside class="help-article__nav" id="articleNav" aria-label="In diesem Artikel"></aside>
+    </div>
+    <article class="help-article__card">
+      {{body}}
+    </article>
+  </main>
+
+  <script src="../assets/js/article-format.js"></script>
+</body>
+</html>

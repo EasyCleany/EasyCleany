@@ -158,7 +158,7 @@
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
       gap:22px;
-      margin-top:-60px;
+      margin-top:20px;
     }
     @media (max-width: 980px){
       .category-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
@@ -315,13 +315,23 @@
     .search-results-head{
       display:flex;
       justify-content:space-between;
-      align-items:flex-end;
+      align-items:flex-start;
       gap:20px;
       margin-bottom:20px;
       background:linear-gradient(135deg, #5a1d99 0%, #833CCF 60%, #4a1d76 100%);
       color:#fff;
       padding:18px 20px;
       border-radius:18px;
+    }
+    .search-back-btn{
+      border:none;
+      background:rgba(255,255,255,.2);
+      color:#fff;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      align-self:flex-start;
     }
     .search-results-head h2{margin:0; color:#fff; font-size:2rem;}
     .search-results-meta{color:rgba(255,255,255,.85);}
@@ -549,6 +559,9 @@
       flex-wrap:wrap;
       margin-bottom:18px;
     }
+    .toolbar.align-right{
+      justify-content:flex-end;
+    }
     .link-btn{
       border:none;
       background:transparent;
@@ -617,6 +630,7 @@
 
       <section id="helpSearch" class="view" aria-label="Suchergebnisse">
         <div class="search-results-head">
+          <button class="search-back-btn" id="backToHomeFromSearch" type="button">← Zurück zur Übersicht</button>
           <div>
             <h2 id="searchResultsTitle">Suchergebnisse</h2>
             <div class="search-results-meta" id="searchResultsMeta">Gib oben einen Begriff ein.</div>
@@ -741,6 +755,7 @@
 
     const backToHome = document.getElementById("backToHome");
     const backToCategory = document.getElementById("backToCategory");
+    const backToHomeFromSearch = document.getElementById("backToHomeFromSearch");
 
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
@@ -897,8 +912,15 @@
       if (article.likes === undefined) article.likes = 0;
 
       backToCategory.textContent = (articleBackTarget === "search")
-        ? "← Zurück zu den Suchergebnissen"
+        ? "← Zurück zu Suchergebnissen"
         : "← Zurück zur Kategorie";
+
+      const articleToolbar = views.article.querySelector(".toolbar");
+      if (articleBackTarget === "search") {
+        articleToolbar.classList.add("align-right");
+      } else {
+        articleToolbar.classList.remove("align-right");
+      }
 
       const sources = Array.isArray(article.sources) ? article.sources : [];
       const sourceLinks = sources.map((source, index) => `
@@ -1300,6 +1322,10 @@
 
     /* === 11) NAV / EVENTS === */
     backToHome.addEventListener("click", () => showView("home"));
+    backToHomeFromSearch.addEventListener("click", () => {
+      showView("home");
+      scrollToElement(categoryGrid);
+    });
     backToCategory.addEventListener("click", () => {
       if (articleBackTarget === "search") {
         showView("search");
