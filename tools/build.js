@@ -30,6 +30,7 @@ const COLLECTIONS = [
     key: "help",
     mdDir: path.join(SITES_DIR, "help", "content", "blog"),
     outSiteDir: path.join(OUT_DIR, "help"),
+    templatePath: path.join(SITES_DIR, "help", "assets", "templates", "article.html"),
   },
 ];
 
@@ -156,6 +157,23 @@ function renderArticleHtml({ title, category, tags, updated, bodyHtml }) {
 </html>`;
 }
 
+function renderArticleTemplate(template, { title, category, tags, updated, bodyHtml, backUrl }) {
+  const meta = [];
+  if (updated) meta.push(`<span>Stand: ${escapeHtml(updated)}</span>`);
+  if (category) meta.push(`<span>Kategorie: ${escapeHtml(category)}</span>`);
+  if (Array.isArray(tags) && tags.length) {
+    meta.push(`<span>Tags: ${tags.map(escapeHtml).join(", ")}</span>`);
+  }
+
+  const metaHtml = meta.length ? `<div class="help-article__meta">${meta.join("")}</div>` : "";
+
+  return template
+    .replaceAll("{{title}}", escapeHtml(title))
+    .replace("{{body}}", bodyHtml)
+    .replace("{{meta}}", metaHtml)
+    .replace("{{backUrl}}", backUrl || "../index.html");
+}
+
 function defaultHomeHtml() {
   // Keine Weiterleitung. Nur Home/Portal mit Links.
   return `<!doctype html>
@@ -213,10 +231,13 @@ function defaultHomeHtml() {
 </html>`;
 }
 
-async function buildCollection({ key, mdDir, outSiteDir }) {
+async function buildCollection({ key, mdDir, outSiteDir, templatePath }) {
   const blogOut = path.join(outSiteDir, "blog");
   const dataOut = path.join(outSiteDir, "data");
   const indexOut = path.join(dataOut, "search-index.json");
+  const template = templatePath && (await exists(templatePath))
+    ? await fsp.readFile(templatePath, "utf8")
+    : null;
 
   // Alte Generierung entfernen
   await rm(blogOut);
@@ -254,7 +275,9 @@ async function buildCollection({ key, mdDir, outSiteDir }) {
     const bodyMd = parsed.content || "";
     const bodyHtml = marked.parse(bodyMd);
 
-    const outHtml = renderArticleHtml({ title, category, tags, updated, bodyHtml });
+    const outHtml = template
+      ? renderArticleTemplate(template, { title, category, tags, updated, bodyHtml, backUrl: "../index.html" })
+      : renderArticleHtml({ title, category, tags, updated, bodyHtml });
     await fsp.writeFile(path.join(blogOut, `${slug}.html`), outHtml, "utf8");
 
     const text = mdToPlainText(bodyMd);

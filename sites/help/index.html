@@ -158,7 +158,7 @@
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
       gap:22px;
-      margin-top:-60px;
+      margin-top:20px;
     }
     @media (max-width: 980px){
       .category-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
@@ -315,13 +315,23 @@
     .search-results-head{
       display:flex;
       justify-content:space-between;
-      align-items:flex-end;
+      align-items:flex-start;
       gap:20px;
       margin-bottom:20px;
       background:linear-gradient(135deg, #5a1d99 0%, #833CCF 60%, #4a1d76 100%);
       color:#fff;
       padding:18px 20px;
       border-radius:18px;
+    }
+    .search-back-btn{
+      border:none;
+      background:rgba(255,255,255,.2);
+      color:#fff;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      align-self:flex-start;
     }
     .search-results-head h2{margin:0; color:#fff; font-size:2rem;}
     .search-results-meta{color:rgba(255,255,255,.85);}
@@ -549,6 +559,9 @@
       flex-wrap:wrap;
       margin-bottom:18px;
     }
+    .toolbar.align-right{
+      justify-content:flex-end;
+    }
     .link-btn{
       border:none;
       background:transparent;
@@ -617,6 +630,7 @@
 
       <section id="helpSearch" class="view" aria-label="Suchergebnisse">
         <div class="search-results-head">
+          <button class="search-back-btn" id="backToHomeFromSearch" type="button">← Zurück zur Übersicht</button>
           <div>
             <h2 id="searchResultsTitle">Suchergebnisse</h2>
             <div class="search-results-meta" id="searchResultsMeta">Gib oben einen Begriff ein.</div>
@@ -741,6 +755,7 @@
 
     const backToHome = document.getElementById("backToHome");
     const backToCategory = document.getElementById("backToCategory");
+    const backToHomeFromSearch = document.getElementById("backToHomeFromSearch");
 
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
@@ -810,6 +825,59 @@
       return (end > 120 ? clipped.slice(0, end + 1) : clipped).trim();
     };
 
+
+    const categoryFallbacks = [
+      {
+        id: "reinigung",
+        title: "Reinigung",
+        subtitle: "Endreinigung der Wohnung",
+        icon: "🧼"
+      },
+      {
+        id: "uebergabe",
+        title: "Wohnungsübergabe",
+        subtitle: "Ablauf & Übergabeprotokoll",
+        icon: "🔑"
+      },
+      {
+        id: "schaeden",
+        title: "Schäden & Abnutzung",
+        subtitle: "Reparaturen und Verantwortlichkeiten",
+        icon: "🛠️"
+      },
+      {
+        id: "kaution",
+        title: "Mietkaution",
+        subtitle: "Mietzinsdepot & Rückzahlung",
+        icon: "💰"
+      },
+      {
+        id: "allgemeines",
+        title: "Allgemeines",
+        subtitle: "Vorbereitung & praktische Tipps",
+        icon: "📌"
+      }
+    ];
+
+    const ensureHomeCategories = () => {
+      if (Array.isArray(helpData) && helpData.length) return helpData;
+      if (!Array.isArray(mdIndex) || !mdIndex.length) return categoryFallbacks;
+
+      const counts = mdIndex.reduce((acc, entry) => {
+        const id = normalizeCategoryId(entry.category || entry.cat || "");
+        acc[id] = (acc[id] || 0) + 1;
+        return acc;
+      }, {});
+
+      return categoryFallbacks
+        .map((category) => ({
+          ...category,
+          description: counts[category.id]
+            ? `${counts[category.id]} Artikel in dieser Kategorie`
+            : category.subtitle
+        }));
+    };
+
     const normalizeCategoryId = (cat) => {
       const s = String(cat || "").toLowerCase();
       if (s.includes("reinig")) return "reinigung";
@@ -821,7 +889,9 @@
 
     /* === 5) RENDER: HOME === */
     const renderHome = () => {
-      categoryGrid.innerHTML = (helpData || []).map(category => `
+      const homeCategories = ensureHomeCategories();
+
+      categoryGrid.innerHTML = (homeCategories || []).map(category => `
         <button class="category-card" data-category="${escapeHtml(category.id)}" type="button">
           <span class="category-icon">${escapeHtml(category.icon || "📌")}</span>
           <h3>${escapeHtml(category.title || "")}</h3>
@@ -833,6 +903,12 @@
         button.addEventListener("click", () => {
           const categoryId = button.dataset.category;
           const category = (helpData || []).find(item => item.id === categoryId);
+          if (!category) {
+            showView("search");
+            searchInput.value = categoryId;
+            renderSearchResults(categoryId);
+            return;
+          }
           if (!category) return;
           renderCategory(category);
         });
@@ -897,8 +973,15 @@
       if (article.likes === undefined) article.likes = 0;
 
       backToCategory.textContent = (articleBackTarget === "search")
-        ? "← Zurück zu den Suchergebnissen"
+        ? "← Zurück zu Suchergebnissen"
         : "← Zurück zur Kategorie";
+
+      const articleToolbar = views.article.querySelector(".toolbar");
+      if (articleBackTarget === "search") {
+        articleToolbar.classList.add("align-right");
+      } else {
+        articleToolbar.classList.remove("align-right");
+      }
 
       const sources = Array.isArray(article.sources) ? article.sources : [];
       const sourceLinks = sources.map((source, index) => `
@@ -1300,6 +1383,10 @@
 
     /* === 11) NAV / EVENTS === */
     backToHome.addEventListener("click", () => showView("home"));
+    backToHomeFromSearch.addEventListener("click", () => {
+      showView("home");
+      scrollToElement(categoryGrid);
+    });
     backToCategory.addEventListener("click", () => {
       if (articleBackTarget === "search") {
         showView("search");
