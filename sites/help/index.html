@@ -1133,6 +1133,59 @@
       return (end > 120 ? clipped.slice(0, end + 1) : clipped).trim();
     };
 
+
+    const categoryFallbacks = [
+      {
+        id: "reinigung",
+        title: "Reinigung",
+        subtitle: "Endreinigung der Wohnung",
+        icon: "🧼"
+      },
+      {
+        id: "uebergabe",
+        title: "Wohnungsübergabe",
+        subtitle: "Ablauf & Übergabeprotokoll",
+        icon: "🔑"
+      },
+      {
+        id: "schaeden",
+        title: "Schäden & Abnutzung",
+        subtitle: "Reparaturen und Verantwortlichkeiten",
+        icon: "🛠️"
+      },
+      {
+        id: "kaution",
+        title: "Mietkaution",
+        subtitle: "Mietzinsdepot & Rückzahlung",
+        icon: "💰"
+      },
+      {
+        id: "allgemeines",
+        title: "Allgemeines",
+        subtitle: "Vorbereitung & praktische Tipps",
+        icon: "📌"
+      }
+    ];
+
+    const ensureHomeCategories = () => {
+      if (Array.isArray(helpData) && helpData.length) return helpData;
+      if (!Array.isArray(mdIndex) || !mdIndex.length) return categoryFallbacks;
+
+      const counts = mdIndex.reduce((acc, entry) => {
+        const id = normalizeCategoryId(entry.category || entry.cat || "");
+        acc[id] = (acc[id] || 0) + 1;
+        return acc;
+      }, {});
+
+      return categoryFallbacks
+        .map((category) => ({
+          ...category,
+          description: counts[category.id]
+            ? `${counts[category.id]} Artikel in dieser Kategorie`
+            : category.subtitle
+        }));
+    };
+
     const normalizeCategoryId = (cat) => {
       const s = String(cat || "").toLowerCase();
       if (s.includes("reinig")) return "reinigung";
@@ -1144,7 +1197,9 @@
 
     /* === 5) RENDER: HOME === */
     const renderHome = () => {
-      categoryGrid.innerHTML = (helpData || []).map(category => `
+      const homeCategories = ensureHomeCategories();
+
+      categoryGrid.innerHTML = (homeCategories || []).map(category => `
         <button class="category-card" data-category="${escapeHtml(category.id)}" type="button">
           <span class="category-icon">${escapeHtml(category.icon || "📌")}</span>
           <h3>${escapeHtml(category.title || "")}</h3>
@@ -1156,6 +1211,12 @@
         button.addEventListener("click", () => {
           const categoryId = button.dataset.category;
           const category = (helpData || []).find(item => item.id === categoryId);
+          if (!category) {
+            showView("search");
+            searchInput.value = categoryId;
+            renderSearchResults(categoryId);
+            return;
+          }
           if (!category) return;
           renderCategory(category);
         });
