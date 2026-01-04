@@ -158,7 +158,7 @@
       display:grid;
       grid-template-columns:repeat(3, minmax(0, 1fr));
       gap:22px;
-      margin-top:-60px;
+      margin-top:20px;
     }
     @media (max-width: 980px){
       .category-grid{grid-template-columns:repeat(2, minmax(0, 1fr));}
@@ -315,13 +315,23 @@
     .search-results-head{
       display:flex;
       justify-content:space-between;
-      align-items:flex-end;
+      align-items:flex-start;
       gap:20px;
       margin-bottom:20px;
       background:linear-gradient(135deg, #5a1d99 0%, #833CCF 60%, #4a1d76 100%);
       color:#fff;
       padding:18px 20px;
       border-radius:18px;
+    }
+    .search-back-btn{
+      border:none;
+      background:rgba(255,255,255,.2);
+      color:#fff;
+      padding:8px 14px;
+      border-radius:999px;
+      font-weight:700;
+      cursor:pointer;
+      align-self:flex-start;
     }
     .search-results-head h2{margin:0; color:#fff; font-size:2rem;}
     .search-results-meta{color:rgba(255,255,255,.85);}
@@ -549,6 +559,9 @@
       flex-wrap:wrap;
       margin-bottom:18px;
     }
+    .toolbar.align-right{
+      justify-content:flex-end;
+    }
     .link-btn{
       border:none;
       background:transparent;
@@ -617,6 +630,7 @@
 
       <section id="helpSearch" class="view" aria-label="Suchergebnisse">
         <div class="search-results-head">
+          <button class="search-back-btn" id="backToHomeFromSearch" type="button">← Zurück zur Übersicht</button>
           <div>
             <h2 id="searchResultsTitle">Suchergebnisse</h2>
             <div class="search-results-meta" id="searchResultsMeta">Gib oben einen Begriff ein.</div>
@@ -694,7 +708,286 @@
 
     /* === 1) DEIN BESTEHENDES HELPDATA HIER EINSETZEN (oder drin lassen) === */
     const helpData = [
-      /* Beispiel (ersetzen durch dein echtes helpData):
+      {
+        id: "reinigung",
+        title: "Reinigung",
+        subtitle: "Endreinigung der Wohnung",
+        icon: "🧽",
+        description: "Standards, Spezialfälle und Verantwortung bei der Endreinigung.",
+        topics: [
+          {
+            id: "reinigung-standard",
+            title: "Übergabe-Standard",
+            icon: "✨",
+            description: "Wie sauber muss es sein – und wann reicht besenrein?",
+            keywords: ["Endreinigung", "Übergabe", "besenrein", "Renovation", "Sauberkeit"],
+            articles: [
+              {
+                id: "reinigung-tipptopp",
+                question: "Wie sauber muss die Wohnung bei der Übergabe sein?",
+                answer: "In der Regel muss eine Mietwohnung gründlich gereinigt übergeben werden – also tipptopp sauber in allen Räumen. Dazu gehören Böden (fegen, staubsaugen, feucht aufnehmen), Fenster (innen und aussen), Küche (alle Geräte, Oberflächen, Spüle, Dampfabzug), Bad/WC (Sanitäreinrichtungen gründlich putzen) sowie Schränke, Keller oder Balkon. Kurz: so sauber, wie man sie selbst als neue Mieterin übernehmen möchte.",
+                extras: ["Plane einen finalen Kontrollrundgang mit Checkliste, damit kein Raum vergessen geht.", "Fotos nach der Reinigung helfen, den Zustand zu dokumentieren."],
+                sources: ["beobachter.ch", "newhome.ch", "mrcleaner.de"]
+              },
+              {
+                id: "reinigung-besenrein",
+                question: "Was bedeutet „besenrein“ und reicht das bei der Wohnungsabgabe?",
+                answer: "„Besenrein“ bedeutet nur grob gereinigt (besensauber, gefegt und oberflächlich sauber). Das genügt nur, wenn es im Mietvertrag ausdrücklich vereinbart ist – oft gegen eine Reinigungspauschale. Selbst dann müssen Bad und Küche gründlich gereinigt werden, da diese Bereiche nicht unter eine blosse Kehrrreinigung fallen.",
+                extras: ["Prüfe deinen Mietvertrag auf eine explizite Vereinbarung zur besenreinen Rückgabe.", "Bei Unklarheit lohnt sich eine kurze schriftliche Nachfrage bei der Vermietung."],
+                sources: ["beobachter.ch"]
+              },
+              {
+                id: "reinigung-renovation",
+                question: "Die Wohnung wird nach meinem Auszug renoviert – muss ich sie trotzdem putzen?",
+                answer: "Bei einer umfassenden Renovation genügt es normalerweise, die Wohnung besenrein zu hinterlassen. Alles, was durch die Renovationsarbeiten ohnehin wieder schmutzig wird, muss nicht im Detail gereinigt werden. Die Baureinigung nach den Arbeiten ist Sache des Vermieters.",
+                extras: ["Lass dir eine geplante Renovation möglichst schriftlich bestätigen.", "Für Küche und Bad kann trotzdem eine Basisreinigung sinnvoll sein, um Diskussionen zu vermeiden."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          },
+          {
+            id: "reinigung-spezial",
+            title: "Reinigungsumfang & Spezialflächen",
+            icon: "🪟",
+            description: "Teppiche, Fensterläden und heikle Arbeiten richtig einordnen.",
+            keywords: ["Teppich shampoonieren", "Fensterläden", "Doppelfenster", "Sicherheitsarbeiten"],
+            articles: [
+              {
+                id: "reinigung-teppich",
+                question: "Muss ich Teppichböden reinigen oder shampoonieren?",
+                answer: "Ja, fest verlegte Teppichböden sollten im Rahmen der Endreinigung gründlich gereinigt werden – oft inklusive Shampoonieren, um Flecken oder tiefsitzenden Schmutz zu entfernen. Eine Ausnahme gilt, wenn der Vermieter den alten Teppich ohnehin unmittelbar nach dem Auszug ersetzt.",
+                extras: ["Frage frühzeitig nach, ob ein Ersatz geplant ist, um unnötige Kosten zu vermeiden.", "Bei empfindlichen Teppichen kann eine professionelle Reinigung sinnvoll sein."],
+                sources: ["mieterverband.ch"]
+              },
+              {
+                id: "reinigung-gefahr",
+                question: "Muss ich gefährliche oder spezielle Reinigungsarbeiten durchführen?",
+                answer: "Nein. Mieterinnen und Mieter müssen zwar gründlich reinigen, aber keine gefährlichen Arbeiten ausführen. Aussen liegende Fensterläden auszuhängen, an der Fassade zu klettern oder alte Doppelfenster zu zerlegen, kann nicht verlangt werden. Arbeiten mit Sicherheitsrisiko oder Fachkenntnis bleiben Aufgabe von Fachpersonen.",
+                extras: ["Bei Unsicherheit hilft ein kurzer Hinweis an die Vermietung, dass die Arbeit risikobehaftet ist.", "Dokumentiere, welche Arbeiten du aus Sicherheitsgründen nicht durchgeführt hast."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          },
+          {
+            id: "reinigung-orga",
+            title: "Organisation & Verantwortung",
+            icon: "🧾",
+            description: "Reinigungsfirma, Abnahmegarantie und Folgen bei Mängeln.",
+            keywords: ["Reinigungsfirma", "Abnahmegarantie", "Nachreinigung", "Kosten"],
+            articles: [
+              {
+                id: "reinigung-firma",
+                question: "Muss ich eine professionelle Reinigungsfirma für die Endreinigung engagieren?",
+                answer: "Nein, es besteht keine Pflicht. Sie dürfen die Endreinigung selbst durchführen. Wichtig ist nur, dass die Wohnung am Ende sauber übergeben wird. Eine Firma mit Abnahmegarantie kann jedoch Stress vermeiden und Nachreinigungen abdecken.",
+                extras: ["Eine Offerte mit Abnahmegarantie kann hilfreich sein, wenn du wenig Zeit hast.", "Vergleiche die Leistungen (Fenster, Ofen, Keller) detailliert."],
+                sources: ["mrcleaner.de"]
+              },
+              {
+                id: "reinigung-nachreinigung",
+                question: "Was passiert, wenn die Wohnung bei der Abgabe nicht sauber genug ist?",
+                answer: "Die Vermieterseite muss Ihnen zuerst eine kurze Nachfrist zum Nachreinigen geben. Erst wenn die Wohnung danach immer noch nicht sauber ist, darf die Vermietung eine Reinigung organisieren und Ihnen die Kosten in Rechnung stellen.",
+                extras: ["Reagiere schnell auf Beanstandungen und protokolliere, was nachgereinigt wurde.", "So lassen sich zusätzliche Kosten meist vermeiden."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "uebergabe",
+        title: "Wohnungsübergabe",
+        subtitle: "Ablauf & Übergabeprotokoll",
+        icon: "🗝️",
+        description: "Termine, Schlüssel, Protokoll und Abgabeablauf.",
+        topics: [
+          {
+            id: "uebergabe-termine",
+            title: "Termin & Schlüssel",
+            icon: "📅",
+            description: "Rückgabezeitpunkt und Übergabeform.",
+            keywords: ["Übergabetermin", "Schlüssel", "Rückgabe", "Fristen"],
+            articles: [
+              {
+                id: "uebergabe-termin",
+                question: "Bis wann muss ich am Auszugstermin die Wohnung übergeben?",
+                answer: "Die Wohnung ist spätestens am letzten Tag der Mietdauer während der üblichen Geschäftszeiten zurückzugeben. Viele Mietverträge erlauben die Abgabe bis Mittag des folgenden Tages, wenn das Mietende auf einen Monatsletzten fällt. Fällt der Termin auf ein Wochenende oder einen Feiertag, verschiebt er sich auf den nächsten Werktag.",
+                extras: ["Vereinbare den Termin frühzeitig schriftlich, damit es keine Missverständnisse gibt.", "Halte den Übergabezeitpunkt im Kalender und im Übergabeprotokoll fest."],
+                sources: ["mieterverband.ch"]
+              },
+              {
+                id: "uebergabe-verweigerung",
+                question: "Was, wenn der Vermieter die Wohnungsabnahme verweigert oder nicht erscheint?",
+                answer: "Ihre Pflicht ist erfüllt, sobald die Wohnung geräumt ist und die Schlüssel fristgerecht übergeben wurden. Erscheint niemand, informieren Sie die Vermietung schriftlich und dokumentieren die Schlüsselübergabe. Im Zweifel senden Sie die Schlüssel per Einschreiben.",
+                extras: ["Bewahre Postbelege oder Empfangsbestätigungen sorgfältig auf.", "Ein Foto der Schlüsselübergabe kann zusätzlich helfen."],
+                sources: ["mieterverband.ch"]
+              },
+              {
+                id: "uebergabe-frueh",
+                question: "Kann ich die Wohnung schon vor dem Mietende übergeben?",
+                answer: "Ja, Sie können früher ausziehen und die Schlüssel abgeben. Schlagen Sie der Vermietung schriftlich einen früheren Termin vor. Wird der frühere Termin abgelehnt, können Sie die Schlüssel trotzdem per Einschreiben senden. Die Mietzahlungspflicht läuft bis Vertragsende weiter, eine Nutzungspflicht gibt es jedoch nicht.",
+                extras: ["Biete einen konkreten Termin mit Zeitfenster an, um die Planung zu erleichtern.", "Dokumentiere den Zustand der Wohnung auch bei vorzeitiger Abgabe."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          },
+          {
+            id: "uebergabe-protokoll",
+            title: "Protokoll & Unterschrift",
+            icon: "📝",
+            description: "Was gilt beim Abnahmeprotokoll und bei Unterschriften?",
+            keywords: ["Abnahmeprotokoll", "Unterschrift", "Schuldanerkennung"],
+            articles: [
+              {
+                id: "uebergabe-unterschrift",
+                question: "Muss ich das Wohnungsübergabe-Protokoll unterschreiben?",
+                answer: "Nein. Unterschreiben Sie nur, wenn Sie mit dem Inhalt vollständig einverstanden sind. Eine Unterschrift bedeutet, dass Sie die festgehaltenen Mängel akzeptieren. Bei Streitpunkten können Sie die Unterschrift verweigern oder einen Zusatz wie „Unterschrift gilt nicht als Schuldanerkennung“ vermerken.",
+                extras: ["Verlange bei Unklarheiten eine Bedenkzeit oder ein separates Gespräch.", "Fotografiere strittige Stellen für deine Unterlagen."],
+                sources: ["mieterverband.ch"]
+              },
+              {
+                id: "uebergabe-druck",
+                question: "Was kann ich tun, wenn ich ein Protokoll unter Druck unterschrieben habe?",
+                answer: "Wenn Sie sich gezwungen fühlten, können Sie Ihre Unterschrift schriftlich widerrufen. Senden Sie rasch einen eingeschriebenen Brief an die Vermietung und erklären Sie, dass Sie unter Irrtum oder Druck unterschrieben haben. In der Praxis werden bei Streitfällen oft Kompromisse gesucht.",
+                extras: ["Schreibe den Widerruf möglichst sofort nach der Übergabe.", "Notiere Namen von Zeugen, die den Druck belegen können."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "schaeden",
+        title: "Schäden & Abnutzung",
+        subtitle: "Reparaturen und Verantwortlichkeiten",
+        icon: "🛠️",
+        description: "Was ist normal, was ist zu bezahlen und wie wird der Zeitwert berechnet?",
+        topics: [
+          {
+            id: "schaeden-abnutzung",
+            title: "Abnutzung vs. Schaden",
+            icon: "⚖️",
+            description: "Unterschiede zwischen normaler Abnutzung und übermässigen Schäden.",
+            keywords: ["Abnutzung", "Schaden", "Zeitwert", "Reparaturkosten"],
+            articles: [
+              {
+                id: "schaeden-normal",
+                question: "Was gilt als normale Abnutzung – und für welche Schäden muss ich bezahlen?",
+                answer: "Normale Abnutzung durch üblichen Gebrauch ist mit der Miete abgegolten und muss nicht bezahlt werden (z.B. leicht verblichene Wände, übliche Kratzer). Übermässige Abnutzung oder Beschädigungen wie Brandlöcher, tiefe Kratzer oder Sprünge müssen hingegen bezahlt werden.",
+                extras: ["Achte darauf, dass Abnutzungen im Protokoll als normal vermerkt werden.", "Zeitwert und Lebensdauer sind entscheidend für die Kosten."],
+                sources: ["hev-winterthur.ch", "newhome.ch"]
+              },
+              {
+                id: "schaeden-zeitwert",
+                question: "Wie wird der Zeitwert bei Schäden berechnet?",
+                answer: "Bei einer nötigen Erneuerung zahlen Sie nicht den Neupreis, sondern den Zeitwert. Die Lebensdauer der Sache wird berücksichtigt. Ist eine Wandfarbe z.B. älter als die übliche Lebensdauer, trägt der Vermieter die Kosten.",
+                extras: ["Frage nach der Lebensdauertabelle, wenn Kosten verlangt werden.", "Lass dir den Berechnungsweg schriftlich erklären."],
+                sources: ["mieterverband.ch", "hev-winterthur.ch"]
+              }
+            ]
+          },
+          {
+            id: "schaeden-anstrich",
+            title: "Wände, Umbauten & kleiner Unterhalt",
+            icon: "🎨",
+            description: "Malerarbeiten, kleine Reparaturen und Rückbau.",
+            keywords: ["Wände streichen", "Umbauten", "kleiner Unterhalt", "Dübellöcher"],
+            articles: [
+              {
+                id: "schaeden-anstrich-frage",
+                question: "Muss ich Wände neu streichen oder für Malerarbeiten aufkommen?",
+                answer: "Grundsätzlich wird ein neutraler weisser Anstrich erwartet, wenn nichts anderes vereinbart ist. Knallige Farben oder starke Vergilbungen können kostenpflichtig sein. Normale Gebrauchsspuren gelten als übliche Abnutzung und müssen nicht bezahlt werden.",
+                extras: ["Prüfe die letzte Renovation: Ist sie lange her, trägt der Vermieter die Kosten.", "Ein Farbtester hilft, kleine Stellen unauffällig zu überstreichen."],
+                sources: ["newhome.ch", "swisscaution.ch"]
+              },
+              {
+                id: "schaeden-umbauten",
+                question: "Muss ich von mir durchgeführte bauliche Änderungen rückgängig machen?",
+                answer: "Umbauten ohne Zustimmung müssen beim Auszug auf Wunsch des Vermieters rückgängig gemacht werden. Holen Sie für grössere Veränderungen immer eine schriftliche Zustimmung ein. Mit Zustimmung darf die Änderung oft bleiben.",
+                extras: ["Bewahre die schriftliche Zustimmung gut auf.", "Rückbaukosten lassen sich vermeiden, wenn du frühzeitig klärst, was gewünscht ist."],
+                sources: ["mieterverband.ch"]
+              },
+              {
+                id: "schaeden-unterhalt",
+                question: "Was zählt als „kleiner Unterhalt“ und was muss ich selbst erledigen?",
+                answer: "Kleiner Unterhalt umfasst einfache, geringfügige Reparaturen wie Glühbirnen ersetzen, Armaturen entkalken, Abflüsse reinigen oder Dübellöcher sauber ausbessern. Arbeiten mit Fachkenntnis sind Sache des Vermieters.",
+                extras: ["Küchen- und Badzubehör wie Dichtungen oder Duschschläuche gelten meist als kleiner Unterhalt.", "Halte Quittungen für Ersatzteile bereit."],
+                sources: ["mieterverband.ch", "newhome.ch"]
+              },
+              {
+                id: "schaeden-duebel",
+                question: "Müssen Dübel- und Bohrlöcher vor dem Auszug geschlossen werden?",
+                answer: "Ja. Löcher sollten fachgerecht zugespachtelt, geschliffen und im passenden Farbton überstrichen werden, damit sie nicht mehr sichtbar sind. Sichtbar verbleibende Löcher gelten als Schaden und können verrechnet werden.",
+                extras: ["Für kleine Löcher reicht oft Fertigspachtel in Kombination mit Farbtupfern.", "Lass die Wand vollständig trocknen, bevor du überstreichst."],
+                sources: ["swisscaution.ch"]
+              }
+            ]
+          },
+          {
+            id: "schaeden-meldung",
+            title: "Meldungen & Schlüssel",
+            icon: "🔐",
+            description: "Fristen, Nachforderungen und Schlüsselverlust.",
+            keywords: ["Mängelrüge", "Schlüsselverlust", "Nachforderung", "Frist"],
+            articles: [
+              {
+                id: "schaeden-meldung-frist",
+                question: "Darf der Vermieter Wochen nach dem Auszug neue Schäden melden?",
+                answer: "Mängel müssen bei der Rückgabe festgehalten und dem Mieter zeitnah mitgeteilt werden. Wird dies versäumt, sind Ansprüche in der Regel verwirkt. Versteckte Mängel müssen sofort nach Entdeckung gemeldet werden.",
+                extras: ["Bewahre das Übergabeprotokoll und Fotos der Abgabe gut auf.", "Späte Rechnungen ohne vorherige Meldung sind oft nicht zulässig."],
+                sources: ["mieterverband.ch"]
+              },
+              {
+                id: "schaeden-schluessel",
+                question: "Ich habe einen Wohnungsschlüssel verloren – muss ich das Schloss bezahlen?",
+                answer: "Wenn keine Missbrauchsgefahr besteht, reicht oft ein Ersatzschlüssel. Besteht ein Sicherheitsrisiko, kann der Austausch des Schliesssystems nötig sein – dabei wird der Zeitwert berücksichtigt. Häufig übernimmt die Privathaftpflichtversicherung solche Kosten.",
+                extras: ["Melde den Verlust sofort deiner Versicherung.", "Frage nach dem Alter des Schlosses für die Zeitwertberechnung."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        id: "kaution",
+        title: "Mietkaution",
+        subtitle: "Mietzinsdepot & Rückzahlung",
+        icon: "💰",
+        description: "Fristen und Vorgehen bei der Freigabe des Depots.",
+        topics: [
+          {
+            id: "kaution-frist",
+            title: "Rückzahlung & Fristen",
+            icon: "⏱️",
+            description: "Wann wird die Kaution freigegeben?",
+            keywords: ["Mietkaution", "Depot", "Auszahlung", "Frist"],
+            articles: [
+              {
+                id: "kaution-auszahlung",
+                question: "Wann muss der Vermieter meine Mietkaution zurückzahlen?",
+                answer: "Nach ordnungsgemässer Übergabe sollte das Depot zeitnah freigegeben werden. Üblich ist eine Frist von etwa 30 Tagen. Ein Teil kann zurückbehalten werden, solange berechtigte Forderungen ungeklärt sind – aber nur verhältnismässig. Spätestens nach 12 Monaten ohne gerichtliche Ansprüche können Sie die Auszahlung direkt bei der Bank verlangen.",
+                extras: ["Prüfe, ob noch eine Nebenkostenabrechnung offen ist.", "Bestehe auf einer schriftlichen Bestätigung des Rückzahlungsstatus."],
+                sources: ["weka.ch"]
+              }
+            ]
+          },
+          {
+            id: "kaution-streit",
+            title: "Wenn die Kaution blockiert wird",
+            icon: "📨",
+            description: "Nächste Schritte bei verweigerter Auszahlung.",
+            keywords: ["Kaution blockiert", "Schlichtungsbehörde", "Rückforderung"],
+            articles: [
+              {
+                id: "kaution-streit",
+                question: "Was kann ich tun, wenn der Vermieter die Kaution nicht zurückzahlt?",
+                answer: "Fordern Sie die Freigabe schriftlich und setzen Sie eine Frist. Reagiert die Vermietung nicht, können Sie bei der Schlichtungsbehörde Klage auf Rückzahlung einreichen. Nach einem Jahr ohne rechtliche Schritte muss die Bank das Geld an Sie auszahlen.",
+                extras: ["Sende Forderungen per Einschreiben, damit du einen Nachweis hast.", "Lege Kopien des Übergabeprotokolls bei."],
+                sources: ["mieterverband.ch"]
+              }
+            ]
+          }
+        ]
+      },
       {
         id: "allgemeines",
         title: "Allgemeines",
@@ -707,20 +1000,49 @@
             title: "Auszugs-Checkliste",
             icon: "✅",
             description: "So behältst du den Überblick bis zur Abgabe.",
-            keywords: ["Checkliste", "Vorbereitung"],
+            keywords: ["Checkliste", "Vorbereitung", "Unterlagen", "Übergabeplan"],
             articles: [
               {
                 id: "allgemeines-plan",
                 question: "Welche Schritte sollte ich vor der Übergabe zuerst planen?",
-                answer: "Plane mindestens zwei Wochen Puffer ...",
-                extras: ["Punkt 1", "Punkt 2"],
+                answer: "Plane mindestens zwei Wochen Puffer für die Endreinigung, kleine Reparaturen und die Terminabstimmung. Erstelle eine Aufgabenliste für Küche, Bad, Fenster, Böden und Keller und hake erledigte Punkte ab.",
+                extras: ["Teile Aufgaben auf, falls Freunde oder Familie helfen.", "Ein fixer Reinigungstag sorgt für klare Prioritäten."],
+                sources: ["Internes Know-how"]
+              },
+              {
+                id: "allgemeines-unterlagen",
+                question: "Welche Unterlagen sollte ich bereithalten?",
+                answer: "Lege Mietvertrag, Übergabeprotokoll, Fotos des Wohnungszustands und allfällige Rechnungen bereit. So kannst du Rückfragen schnell klären.",
+                extras: ["Digitale Kopien auf dem Handy sind am Übergabetag praktisch.", "Notiere Ansprechpartner und Telefonnummern der Verwaltung."],
+                sources: ["Internes Know-how"]
+              }
+            ]
+          },
+          {
+            id: "allgemeines-ablauf",
+            title: "Reibungslose Übergabe",
+            icon: "🤝",
+            description: "Kommunikation und klare Absprachen.",
+            keywords: ["Kommunikation", "Abnahme", "Protokoll", "Übergabetermin"],
+            articles: [
+              {
+                id: "allgemeines-termine",
+                question: "Wie bestätige ich Termine richtig?",
+                answer: "Bestätige Übergabetermine schriftlich per E-Mail oder Brief und nenne ein klares Zeitfenster. So wissen beide Seiten, wann die Abnahme stattfindet.",
+                extras: ["Bitte um eine kurze Bestätigung der Vermietung.", "Speichere E-Mails oder Briefe im Übergabeordner."],
+                sources: ["Internes Know-how"]
+              },
+              {
+                id: "allgemeines-stressfrei",
+                question: "Was hilft gegen Missverständnisse bei der Abnahme?",
+                answer: "Halte Absprachen schriftlich fest, dokumentiere den Zustand der Wohnung mit Fotos und bringe alle Schlüssel geordnet mit. Ein ruhiger, vorbereiteter Ablauf reduziert Konflikte.",
+                extras: ["Eine zweite Person als Begleitung kann helfen, Details zu belegen.", "Notiere offene Punkte direkt im Protokoll."],
                 sources: ["Internes Know-how"]
               }
             ]
           }
         ]
       }
-      */
     ];
 
     /* === 2) DOM === */
@@ -741,6 +1063,7 @@
 
     const backToHome = document.getElementById("backToHome");
     const backToCategory = document.getElementById("backToCategory");
+    const backToHomeFromSearch = document.getElementById("backToHomeFromSearch");
 
     const searchInput = document.getElementById("searchInput");
     const searchBtn = document.getElementById("searchBtn");
@@ -897,8 +1220,15 @@
       if (article.likes === undefined) article.likes = 0;
 
       backToCategory.textContent = (articleBackTarget === "search")
-        ? "← Zurück zu den Suchergebnissen"
+        ? "← Zurück zu Suchergebnissen"
         : "← Zurück zur Kategorie";
+
+      const articleToolbar = views.article.querySelector(".toolbar");
+      if (articleBackTarget === "search") {
+        articleToolbar.classList.add("align-right");
+      } else {
+        articleToolbar.classList.remove("align-right");
+      }
 
       const sources = Array.isArray(article.sources) ? article.sources : [];
       const sourceLinks = sources.map((source, index) => `
@@ -1300,6 +1630,10 @@
 
     /* === 11) NAV / EVENTS === */
     backToHome.addEventListener("click", () => showView("home"));
+    backToHomeFromSearch.addEventListener("click", () => {
+      showView("home");
+      scrollToElement(categoryGrid);
+    });
     backToCategory.addEventListener("click", () => {
       if (articleBackTarget === "search") {
         showView("search");
