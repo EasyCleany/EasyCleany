@@ -1,0 +1,227 @@
+:root {
+  --purple: #8f6ba8;
+  --deep-purple: #3b0c63;
+  --accent-purple: #6d38a7;
+  --text-dark: #2d1a3a;
+  --text-body: #4a325c;
+  --green-line: #29413c;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: "Poppins", sans-serif;
+  color: var(--text-body);
+  background-color: #ffffff;
+}
+
+img {
+  max-width: 100%;
+  display: block;
+}
+
+.container {
+  width: min(1100px, 90%);
+  margin: 0 auto;
+}
+
+.site-header {
+  background: var(--purple);
+  padding: 20px 0;
+}
+
+.header-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: #ffffff;
+  font-family: "Playfair Display", serif;
+}
+
+.logo-icon {
+  width: 60px;
+  height: 60px;
+}
+
+.logo-text {
+  font-size: 26px;
+  line-height: 1.1;
+  font-weight: 600;
+}
+
+.nav {
+  display: flex;
+  gap: 24px;
+  font-size: 14px;
+}
+
+.nav a {
+  color: #f2e9f7;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.cta {
+  border: none;
+  background: var(--deep-purple);
+  color: #ffffff;
+  padding: 12px 26px;
+  border-radius: 999px;
+  font-weight: 600;
+  letter-spacing: 0.4px;
+  text-transform: uppercase;
+  font-size: 12px;
+}
+
+.hero {
+  padding: 60px 0 80px;
+  text-align: center;
+}
+
+.hero h1 {
+  font-family: "Playfair Display", serif;
+  color: var(--deep-purple);
+  font-size: clamp(32px, 4vw, 44px);
+  margin-bottom: 60px;
+}
+
+.service-options {
+  display: flex;
+  justify-content: center;
+  gap: 80px;
+  flex-wrap: wrap;
+}
+
+.service-card {
+  display: grid;
+  place-items: center;
+  gap: 18px;
+  color: var(--deep-purple);
+  font-size: 18px;
+  text-align: center;
+}
+
+.service-card svg {
+  width: 160px;
+  height: 160px;
+}
+
+.section {
+  padding: 90px 0;
+  position: relative;
+}
+
+.section h2 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(30px, 4vw, 44px);
+  color: var(--deep-purple);
+  margin-bottom: 24px;
+}
+
+.section h3 {
+  font-family: "Playfair Display", serif;
+  font-size: clamp(26px, 3.2vw, 36px);
+  color: var(--deep-purple);
+  margin-bottom: 16px;
+}
+
+.split {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 50px;
+  align-items: center;
+}
+
+.split.reverse {
+  direction: rtl;
+}
+
+.split.reverse > * {
+  direction: ltr;
+}
+
+.text-block ul {
+  list-style: disc;
+  margin-left: 20px;
+  display: grid;
+  gap: 16px;
+  font-size: 16px;
+}
+
+.text-block strong {
+  color: var(--deep-purple);
+}
+
+.image-block img,
+.image-block svg {
+  width: 100%;
+  border-radius: 8px;
+  box-shadow: 0 12px 32px rgba(0, 0, 0, 0.08);
+}
+
+.map-card {
+  background: #ffffff;
+  border-radius: 12px;
+  border: 1px solid #e5e2ea;
+  padding: 20px;
+}
+
+.wave-top::before {
+  content: "";
+  position: absolute;
+  top: -25px;
+  left: 0;
+  right: 0;
+  height: 60px;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1200 120'%3E%3Cpath d='M0 60 C 200 10 400 10 600 60 C 800 110 1000 110 1200 60' fill='none' stroke='%237c3aed' stroke-width='6' stroke-dasharray='20 18' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-repeat: repeat-x;
+  background-size: 1200px 60px;
+}
+
+.about h2 {
+  text-align: center;
+  margin-bottom: 60px;
+}
+
+.site-footer {
+  padding: 30px 0 50px;
+  text-align: center;
+  color: #6c5a78;
+  font-size: 14px;
+}
+
+@media (max-width: 900px) {
+  .header-content {
+    flex-direction: column;
+  }
+
+  .nav {
+    flex-wrap: wrap;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 600px) {
+  .hero {
+    padding-top: 40px;
+  }
+
+  .service-options {
+    gap: 40px;
+  }
+
+  .cta {
+    width: 100%;
+  }
+}
